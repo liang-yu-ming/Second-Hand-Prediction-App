@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/ImageProblem"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="照片問題點"
+        app:layout_constraintLeft_toLeftOf="@id/PriceTitle"
+        app:layout_constraintTop_toBottomOf="@id/PriceTitle" />
+
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="176dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:text="書名"
+        android:textSize="40sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/GradeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="50dp"
+        android:text="折舊分數:"
+        android:textSize="25sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Title" />
+
+    <TextView
+        android:id="@+id/Grade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="500"
+        android:textSize="25sp"
+        app:layout_constraintTop_toTopOf="@id/GradeTitle"
+        app:layout_constraintLeft_toRightOf="@id/GradeTitle"/>
+
+    <TextView
+        android:id="@+id/PropotionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="折舊比例:"
+        android:textSize="25sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/GradeTitle"
+        app:layout_constraintLeft_toLeftOf="@id/GradeTitle"/>
+
+    <TextView
+        android:id="@+id/Propotion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="80%"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/Grade"
+        app:layout_constraintLeft_toRightOf="@id/PropotionTitle"/>
+
+    <TextView
+        android:id="@+id/PriceTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="建議售價:"
+        android:textSize="25sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/PropotionTitle"
+        app:layout_constraintLeft_toLeftOf="@id/PropotionTitle"/>
+
+    <TextView
+        android:id="@+id/Price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="300$$"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/Propotion"
+        app:layout_constraintLeft_toRightOf="@id/PriceTitle"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="400dp"/>
+
+</LinearLayout>

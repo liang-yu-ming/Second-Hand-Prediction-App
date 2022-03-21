@@ -9,4 +9,13 @@
 
     <string name="hello_first_fragment">歷史預測紀錄</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string-array name="spinner_of_data">
+        <item>文學小說</item>
+        <item>商業理財</item>
+        <item>社會科學</item>
+        <item>心理勵志</item>
+        <item>人文史地</item>
+        <item>其他</item>
+    </string-array>
 </resources>

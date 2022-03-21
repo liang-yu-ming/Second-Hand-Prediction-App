@@ -3,12 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/activity_data.xml" value="0.264" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/activity_main.xml" value="0.225" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/activity_show_icon.xml" value="0.264" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/content_main.xml" value="0.19972826086956522" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/fragment_first.xml" value="0.536" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/layout/fragment_second.xml" value="0.19972826086956522" />
         <entry key="..\:/Second-Hand-Prediction-App/app/src/main/res/menu/menu_main.xml" value="0.225" />
+        <entry key="..\:/Users/ming/Desktop/Second-Hand-Prediction-App/app/src/main/res/layout/activity_data.xml" value="0.2105978260869565" />
+        <entry key="..\:/Users/ming/Desktop/Second-Hand-Prediction-App/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/ming/Desktop/Second-Hand-Prediction-App/app/src/main/res/layout/result.xml" value="0.2105978260869565" />
+        <entry key="..\:/Users/ming/Desktop/Second-Hand-Prediction-App/app/src/main/res/layout/result_second.xml" value="0.2105978260869565" />
       </map>
     </option>
   </component>

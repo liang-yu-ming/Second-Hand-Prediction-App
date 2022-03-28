@@ -20,7 +20,7 @@ public class Result extends AppCompatActivity {
 
         Bundle test = this.getIntent().getExtras();
         String input = test.getString("test");
-        System.out.println("input: " + test.getString("test"));
+        //System.out.println("input: " + test.getString("test"));
 
         File dir = this.getFilesDir();
         //System.out.println(this.getFilesDir());
@@ -28,15 +28,8 @@ public class Result extends AppCompatActivity {
         File[] files = dir.listFiles();
         int count = files.length;
         String filename = "test" + String.valueOf(count+1);
-        System.out.println("filename: " + filename);
+        //System.out.println("filename: " + filename);
         //write_tmp(dir, filename, input);
-        /*
-        String[] names = dir.list();
-        for(String name : names)
-            System.out.println(name + "  ");
-
-         */
-        System.out.println("count: " + count);
 
 
         Button to_main_page = (Button) findViewById(R.id.button4);

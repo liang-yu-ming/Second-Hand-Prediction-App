@@ -7,26 +7,32 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Data extends AppCompatActivity {
+
+    TCPClient tcpClient;
+    ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
-
+    /*
+        tcpClient = new TCPClient("10.201.30.55", 5422, this);
+        exec.execute(tcpClient);
+        exec.execute(()->tcpClient.run());
+        System.out.println("hihihihihih");
+     */
         AdapterView.OnItemSelectedListener spnOnItemSelected
                 = new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
-                String sPos=String.valueOf(pos);
-                String sInfo=parent.getItemAtPosition(pos).toString();
-                //String sInfo=parent.getSelectedItem().toString()
             }
             public void onNothingSelected(AdapterView<?> parent) {
-                //
             }
         };
 
@@ -40,7 +46,12 @@ public class Data extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putString("test", test.getText().toString());
                 intent.putExtras(bundle);
-
+                /*
+                if (tcpClient == null) return;
+                if (test.getText().toString().length() == 0 || !tcpClient.getStatus()) ;
+                exec.execute(() -> tcpClient.send(test.getText().toString()));
+                tcpClient.closeClient();
+                 */
                 startActivity(intent);
             }
         });

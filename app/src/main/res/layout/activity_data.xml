@@ -69,10 +69,12 @@
         android:id="@+id/textView3"
         android:layout_width="96dp"
         android:layout_height="54dp"
+        android:layout_marginTop="336dp"
+        android:layout_marginEnd="268dp"
         android:text="書籍類別:"
         android:textSize="20dp"
-        tools:layout_editor_absoluteX="42dp"
-        tools:layout_editor_absoluteY="327dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
         android:id="@+id/spinner"

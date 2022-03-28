@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.example.myapplication.databinding.FragmentFirstBinding;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -36,19 +39,28 @@ public class FirstFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-/*
+
         LinearLayout linear=(LinearLayout) getView().findViewById(R.id.history_button_layout);
         File dir = this.getActivity().getFilesDir();
-        File[] files = dir.listFiles();;
-        for (int i = 0; i < files.length; i++){
-            String str = read(i);
+        File[] files = dir.listFiles();
+        for (int i = 1; i < files.length+1; i++){
+            String file_name = "test" + String.valueOf(i);
+            String str = read_tmp(dir, file_name);
             Button btn = new Button(getActivity());
             btn.setText(str);
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), Result.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("file_name", str);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
             linear.addView(btn);
+            System.out.println(str);
         }
-
- */
-
     }
 
     @Override
@@ -57,26 +69,33 @@ public class FirstFragment extends Fragment {
         binding = null;
     }
 
-    public String read(int file_account){
-        FileInputStream fis;
-        BufferedReader reader=null;//這裡要初始化null
-        StringBuilder builder=new StringBuilder();
-        try{
-            fis = getActivity().openFileInput("data" + String.valueOf(file_account));
-            reader=new BufferedReader(new InputStreamReader(fis));
-            String lines="";
-            while((lines=reader.readLine())!=null){
-                builder.append(lines);
+
+    public  String  read_tmp( File file, String name){
+        File inFile = new File(file, name);
+        String str = "";
+        str = readFromFile(inFile);
+        return str;
+    }
+
+    private String readFromFile(File fin) {
+        StringBuilder data = new StringBuilder();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(fin), "utf-8"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                data.append(line);
             }
-        }catch (IOException e){
-            e.printStackTrace();
-        }finally {
+        } catch (Exception e) {
+            ;
+        } finally {
             try {
                 reader.close();
-            }catch (IOException e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                ;
             }
         }
-        return builder.toString();
+        return data.toString();
     }
 }

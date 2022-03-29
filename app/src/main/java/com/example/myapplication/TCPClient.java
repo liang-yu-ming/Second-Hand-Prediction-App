@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,10 +10,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class TCPClient implements Runnable {
-    private String  serverIP;
-    private int serverPort;
+    private final String  serverIP;
+    private final int serverPort;
     private boolean isRun = false;
     private PrintWriter pw;
     private BufferedReader br;
@@ -41,8 +43,8 @@ public class TCPClient implements Runnable {
     public void run() {
         try {
             /*將Socket指向指定的IP & Port*/
-            socket = new Socket(serverIP,serverPort);
             System.out.println(serverIP + " " + serverPort);
+            socket = new Socket(serverIP,serverPort);
             socket.setSoTimeout(5000);
             System.out.println("231231");
 
@@ -50,6 +52,7 @@ public class TCPClient implements Runnable {
 
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("123", String.valueOf(e));
         }
         while (isRun){
             try {

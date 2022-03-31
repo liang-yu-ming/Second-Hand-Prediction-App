@@ -15,28 +15,38 @@ import java.nio.charset.StandardCharsets;
 public class TCPClient implements Runnable {
     private final String  serverIP;
     private final int serverPort;
-    private boolean isRun = false;
+    private boolean isSend = false;
     private PrintWriter pw;
     private BufferedReader br;
     private Socket socket;
     private Context context;
+    public  String RecMsg = "";
 
     public TCPClient(String ip, int port, Context context){
         this.serverIP = ip;
         this.serverPort = port;
         this.context = context;
     }
-    public boolean getStatus(){
-        return isRun;
-    }//determine the device whether connect or not
-
-    public void closeClient(){
-        isRun = false;
-    }//stop connect
+    //public boolean getStatus(){
+        //return isRun;
+    //}determine the device whether connect or not
 
     public void send(String msg){
         pw.println(msg);
         pw.flush();
+        pw.close();
+        isSend = true;
+    }
+
+    public String receive(){
+        String text = "";
+        try {
+            text = br.readLine();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return text;
     }
 
     @Override
@@ -48,29 +58,23 @@ public class TCPClient implements Runnable {
             socket.setSoTimeout(5000);
             System.out.println("231231");
 
-            isRun = true;
+            //isRun = true;
 
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("123", String.valueOf(e));
         }
-        while (isRun){
-            try {
-                while (socket.isConnected()) {
-                    pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                    br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         try {
-            if (pw != null)
-                pw.close();
-            if (br != null)
-                br.close();
-            if (socket != null)
-                socket.close();
+            pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8")), true);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while(!isSend);
+        try {
+            RecMsg = br.readLine();
+            br.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

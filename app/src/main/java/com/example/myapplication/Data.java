@@ -2,16 +2,14 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-
 import androidx.appcompat.app.AppCompatActivity;
+import java.nio.charset.StandardCharsets;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,32 +47,36 @@ public class Data extends AppCompatActivity {
             bundle.putString("test", test.getText().toString());
             intent.putExtras(bundle);
             if (tcpClient == null) return;
-            if (test.getText().toString().length() == 0 || !tcpClient.getStatus()) return;
+            if (test.getText().toString().length() == 0) return;
             exec.execute(() -> tcpClient.send(test.getText().toString()));
 
             Log.d("123", test.getText().toString());
-            exec.execute(() -> tcpClient.closeClient());
 
             startActivity(intent);
         });
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter =
-                ArrayAdapter.createFromResource(this,
-                        R.array.spinner_of_data,
-                        android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(2, false);
-        spinner.setOnItemSelectedListener(spnOnItemSelected);
-
-
     }
+    /*
+    public void onclickSend(View view){
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //exec.shutdown();
-        //tcpClient.closeClient();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);  //取得spinner的參考
+        String kind = String.valueOf(spinner.getSelectedItem()); //取得使用者在spinner選擇的項目
+
+        EditText BookName = (EditText) findViewById(R.id.editTextTextPersonName); //取得BookName的參考
+        String name = BookName.getText().toString(); //取得書籍名稱
+        byte[] bookname = name.getBytes(StandardCharsets.UTF_8); //bookname為書籍名稱的byte型式
+
+        EditText BookMonth = (EditText) findViewById(R.id.editTextTextPersonName2); //取得BookMonth的參考
+        String month = BookMonth.getText().toString(); //取得書籍年齡(string)
+        byte[] bookmonth = month.getBytes(StandardCharsets.UTF_8); //bookmonth為書籍年齡的byte型式
+        //int bookmonth;
+        //bookmonth = Integer.valueOf(month);//取得書籍年齡(int)
+
+        EditText BookPrize = (EditText) findViewById(R.id.editTextTextPersonName3); //取得BookPrize的參考
+        String prize = BookPrize.getText().toString(); //取得原始價格(string)
+        byte[] bookprize = prize.getBytes(StandardCharsets.UTF_8); //bookprize為原始價格的byte型式
+        //int bookprize;
+        //bookprize = Integer.valueOf(prize);//取得原始價格(int)
     }
+     */
 }

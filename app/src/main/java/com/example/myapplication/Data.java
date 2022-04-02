@@ -2,31 +2,18 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import androidx.appcompat.app.AppCompatActivity;
-import java.nio.charset.StandardCharsets;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Data extends AppCompatActivity {
-
-    TCPClient tcpClient;
-    ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
-        tcpClient = new TCPClient("10.201.30.55", 5422, this);
-        exec.execute(tcpClient);
-        //exec.execute(() -> tcpClient.run());
-        System.out.println("hihihihihih");
 
         AdapterView.OnItemSelectedListener spnOnItemSelected
                 = new AdapterView.OnItemSelectedListener() {
@@ -39,18 +26,13 @@ public class Data extends AppCompatActivity {
         };
 
         EditText test = (EditText) findViewById(R.id.editTextTextPersonName);
-        Button to_data_page = (Button) findViewById(R.id.button3);
-        to_data_page.setOnClickListener(v -> {
-            Intent intent = new Intent(Data.this, Result.class);
+        Button to_tcpclientwaiting_page = (Button) findViewById(R.id.button3);
+        to_tcpclientwaiting_page.setOnClickListener(v -> {
+            Intent intent = new Intent(Data.this, TCPClient_Waiting.class);
 
             Bundle bundle = new Bundle();
             bundle.putString("test", test.getText().toString());
             intent.putExtras(bundle);
-            if (tcpClient == null) return;
-            if (test.getText().toString().length() == 0) return;
-            exec.execute(() -> tcpClient.send(test.getText().toString()));
-
-            Log.d("123", test.getText().toString());
 
             startActivity(intent);
         });

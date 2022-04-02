@@ -19,7 +19,7 @@ public class Result extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         Bundle test = this.getIntent().getExtras();
-        String input = test.getString("test");
+        String input = test.getString("result");
         //System.out.println("input: " + test.getString("test"));
 
         File dir = this.getFilesDir();

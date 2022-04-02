@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
+            android:name=".TCPClient_Waiting"
+            android:exported="false" />
+        <activity
             android:name=".Choose_pic"
             android:exported="false" />
         <activity

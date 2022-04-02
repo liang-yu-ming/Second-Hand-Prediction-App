@@ -59,7 +59,7 @@ public class FirstFragment extends Fragment {
                 }
             });
             linear.addView(btn);
-            System.out.println(str);
+            //tem.out.println(str);
         }
     }
 

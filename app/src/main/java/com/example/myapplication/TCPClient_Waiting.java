@@ -20,6 +20,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private BufferedReader br;
     private Socket socket;
     private String input = "";
+    private byte[] SendMsg = new byte[0];
+    private String RecMsg = "";
     private final String serverip = "192.168.0.122";
     private final int serverport = 5422;
 
@@ -31,10 +33,18 @@ public class TCPClient_Waiting extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("hihihih");
         setContentView(R.layout.activity_tcpclient_waiting);
 
-        Bundle test = this.getIntent().getExtras();
-        input = test.getString("test");
+        //Bundle test = this.getIntent().getExtras();
+        //input = test.getString("test");
+        //System.out.println(input);
+
+        Bundle sendmsg_resource = this.getIntent().getExtras();
+        byte[] sendmsg = sendmsg_resource.getByteArray("all_photo");
+        SendMsg = addBytes(SendMsg, sendmsg);
+        System.out.println(sendmsg.length);
+
 
         TCPClientThread tcpClientThread = new TCPClientThread();
         Thread t = new Thread(tcpClientThread);
@@ -46,6 +56,11 @@ public class TCPClient_Waiting extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        String bookname = Data.Book.bookname;
+        String bookmonth = Data.Book.bookmonth;
+        String bookprize = Data.Book.bookprize;
+        String bookkind = Data.Book.bookkind;
+
     }
 
     private class TCPClientThread implements Runnable{
@@ -56,7 +71,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
     }
 
     private void setTcpConnect(){
-        String RecMsg = "";
         try {
             socket = new Socket(serverip,serverport);
             socket.setSoTimeout(5000);
@@ -72,6 +86,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
         }
         try {
             send(input);
+            //send(SendMsg);
             RecMsg = br.readLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,6 +107,13 @@ public class TCPClient_Waiting extends AppCompatActivity {
         intent.putExtras(bundle);
 
         startActivity(intent);
+    }
+
+    public static byte[] addBytes(byte[] data1, byte[] data2) {
+        byte[] data3 = new byte[data1.length + data2.length];
+        System.arraycopy(data1, 0, data3, 0, data1.length);
+        System.arraycopy(data2, 0, data3, data1.length, data2.length);
+        return data3;
     }
 
 }

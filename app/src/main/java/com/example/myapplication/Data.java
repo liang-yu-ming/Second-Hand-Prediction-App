@@ -3,10 +3,8 @@ package com.example.myapplication;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,7 +17,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -28,16 +25,24 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Data extends AppCompatActivity {
 
     public static final int READ_REQUEST_CODE = 1;
     private byte[] Sendmsg = new byte[0];
+    public String current_folder_name = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,6 @@ public class Data extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             externalHasGone = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;
-            System.out.println(externalHasGone);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] permissions;
@@ -159,10 +163,43 @@ public class Data extends AppCompatActivity {
 
             Book book = getBookInformation();
 
-            Bundle bundle = new Bundle();
+            //Bundle bundle = new Bundle();
             //bundle.putString("test", test.getText().toString());
-            bundle.putByteArray("all_photo", Sendmsg);
+            //System.out.println(Sendmsg.length);
+            //bundle.putByteArray("allphoto", Sendmsg);
+            //intent.putExtras(bundle);
+
+            File dir = this.getFilesDir();
+            File[] files = dir.listFiles();
+            int filesCount = files.length;
+
+            String folder_name = dir.getPath() + "/" + String.valueOf(filesCount);
+            current_folder_name = folder_name;
+            File folder = new File(folder_name);
+            if(!folder.exists())
+                folder.mkdir();
+
+            String folder_tmp_name = dir.getPath() + "/tmp";
+            File folder_tmp = new File(folder_tmp_name);
+            File[] photo_files = folder_tmp.listFiles();
+            for (int i = 0; i < photo_files.length; i++){
+                String new_path = folder_name + "/photo" + String.valueOf(i) + ".png";
+                try {
+                    fileCopy(photo_files[i].getPath(), new_path);
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+
+
+            String fileName = "test";
+            write_byte(folder, fileName, Sendmsg);
+            Bundle bundle = new Bundle();
+            bundle.putInt("folderName", filesCount);
+            //System.out.println("filename = " + fileName);
             intent.putExtras(bundle);
+
+            write_book_information(book);
 
             startActivity(intent);
         });
@@ -195,55 +232,77 @@ public class Data extends AppCompatActivity {
                 }
                 break;
         }
-        System.out.println(word);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
-        Bitmap bm = null;
-        String s = "_";
-        Integer tmp = 14;
-        byte[] allphoto =tmp.toString().getBytes(StandardCharsets.UTF_8);
-        byte[] bottomline = s.getBytes(StandardCharsets.UTF_8);
         if (requestCode == READ_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (resultData.getData()!=null) {      // select one image
-                Uri selectedImage = resultData.getData();   //get the uri of picture
+            if (resultData.getData()!=null) {
+                Uri selectedImage = resultData.getData();
                 String filePath =  getImageAbsolutePath(this, selectedImage);
-                File file = new File(filePath);
-                bm = getResizedBitmap(filePath);
-                int bytes = bm.getByteCount();
-                ByteBuffer buf = ByteBuffer.allocate(bytes);
-                bm.copyPixelsToBuffer(buf);
-                byte[] byteArray = buf.array();
-                allphoto = addBytes(allphoto, bottomline);
-                allphoto = addBytes(allphoto, byteArray);
+                Bitmap bm = getResizedBitmap(filePath);
+                String photo_path = saveBitmap(bm, 0);
+                File file = new File(photo_path);
+                int file_size = 4 + (int)file.length();
+                byte[] imagedatas = new byte[file_size + 4];
+                byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
+                System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
+                int count = 4;
+                try{
+                    FileInputStream input = new FileInputStream(file.getAbsolutePath());
+                    byte[] imagedata = new byte[(int)file.length()];
+                    byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();
+                    System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
+                    count += 4;
+                    input.read(imagedata);
+                    System.arraycopy(imagedata, 0, imagedatas, count, (int)file.length());
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                Sendmsg = addBytes(Sendmsg, imagedatas);
             }
             else{
                 if (resultData.getClipData() != null){
-                    System.out.println("21313");
-                    for (int i = 0; i < resultData.getClipData().getItemCount(); i++) {
-                        Uri selectedImages = resultData.getClipData().getItemAt(i).getUri();//
+                    int file_size = resultData.getClipData().getItemCount() * 4;
+                    for (int j = 0; j < resultData.getClipData().getItemCount(); j++){
+                        Uri selectedImages = resultData.getClipData().getItemAt(j).getUri();
                         String filePath =  getImageAbsolutePath(this, selectedImages);
-                        File file = new File(filePath);
-                        bm = getResizedBitmap(filePath);   //get the picture by path
-                        //
-                        int bytes = bm.getByteCount();
-                        ByteBuffer buf = ByteBuffer.allocate(bytes);
-                        bm.copyPixelsToBuffer(buf);
-                        byte[] byteArray = buf.array();
-                        //convert bitmap to byte[]
-                        allphoto = addBytes(allphoto, bottomline);
-                        allphoto = addBytes(allphoto, byteArray);
-                        System.out.println(allphoto.length);
+                        Bitmap bm = getResizedBitmap(filePath);
+                        String photo_path = saveBitmap(bm, j);
+
+                        File file = new File(photo_path);
+                        System.out.println("one photo size : " + file.length());
+                        file_size += file.length();
                     }
+                    byte[] imagedatas = new byte[file_size + 4];
+                    byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
+                    System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
+
+                    int count = 4;
+                    File folder_tmp = new File(this.getFilesDir().getPath() + "/tmp");
+                    File[] photo_files = folder_tmp.listFiles();
+                    for(int i = 0; i < photo_files.length; i++){
+                        File file = new File(photo_files[i].getPath());
+                        try{
+                            FileInputStream input = new FileInputStream(file.getAbsolutePath());
+                            byte[] imagedata = new byte[(int)file.length()];
+                            byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();
+                            System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
+                            count += 4;
+                            input.read(imagedata);
+                            System.arraycopy(imagedata, 0, imagedatas, count, (int)file.length());
+                            count += (int)file.length();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    Sendmsg = addBytes(Sendmsg, imagedatas);
                 }
             }
         }
         Button to_album = (Button) findViewById(R.id.ButtonPageClass1);
         to_album.setText("already selected");
-        System.out.println("allphoto = " + allphoto.length);
-        Sendmsg = addBytes(Sendmsg, allphoto);
     }
 
     @TargetApi(19)
@@ -311,7 +370,9 @@ public class Data extends AppCompatActivity {
 
     private Bitmap getResizedBitmap(String imagePath) {
         // 取得原始圖檔的bitmap與寬高
+
         BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
         int width = options.outWidth, height = options.outHeight;
 
@@ -329,6 +390,43 @@ public class Data extends AppCompatActivity {
         // 產生縮小後的圖
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
         return resizedBitmap;
+    }
+
+    public String saveBitmap(Bitmap bitmap, int count) {
+        FileOutputStream fOut;
+        String photo_name = "";
+        try {
+            String folder_name = this.getFilesDir() + "/tmp";
+            File folder = new File(folder_name);
+            if(!folder.exists())
+                folder.mkdir();
+            photo_name = folder_name + "/photo" + String.valueOf(count) + ".png";
+            fOut = new FileOutputStream(new File(photo_name));
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            try {
+                fOut.flush();
+                fOut.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return photo_name;
+    }
+
+    public void fileCopy(String oldFilePath,String newFilePath) throws IOException {
+        //獲得原檔案流
+        FileInputStream inputStream = new FileInputStream(new File(oldFilePath));
+        byte[] data = new byte[1024];
+        //輸出流
+        FileOutputStream outputStream =new FileOutputStream(new File(newFilePath));
+        //開始處理流
+        while (inputStream.read(data) != -1) {
+            outputStream.write(data);
+        }
+        inputStream.close();
+        outputStream.close();
     }
 
     public static boolean isExternalStorageDocument(Uri uri) {
@@ -354,6 +452,59 @@ public class Data extends AppCompatActivity {
         return data3;
     }
 
+    public  void  write_byte(File file, String name, byte[] input){
+        File outFile = new File(file, name);
+        writeToFile(outFile, input);
+    }
+
+    private void writeToFile(File fout, byte[] data) {
+        FileOutputStream osw = null;
+        try {
+            osw = new FileOutputStream(fout);
+            osw.write(data);
+            osw.flush();
+        } catch (Exception e) {
+            ;
+        } finally {
+            try {
+                osw.close();
+            } catch (Exception e) {
+                ;
+            }
+        }
+    }
+
+    public void write_string(File file, String name, String input){
+        File outFile = new File(file, name);
+        FileOutputStream outputStream;
+        try {
+            outputStream = new FileOutputStream(outFile, true);
+            outputStream.write(input.getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+            outputStream.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void write_book_information(Book book){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        String t = format.format(new Date());
+        String tmp = "_" + book.getBookname();
+        t = t + tmp;
+        tmp = "_" + book.getBookmonth();
+        t = t + tmp;
+        tmp = "_" + book.getBookprize();
+        t = t + tmp;
+        tmp = "_" + book.getBookkind();
+        t = t + tmp;
+        t = t + "\n";
+
+        File dir = new File(current_folder_name);
+        String index = "book_information.txt";
+        write_string(dir, index, t);
+    }
+
     public static class Book{
         public static String bookname;
         public static String bookmonth;
@@ -365,6 +516,22 @@ public class Data extends AppCompatActivity {
             this.bookmonth = bookmonth;
             this.bookprize = bookprize;
             this.bookkind = bookkind;
+        }
+
+        public String getBookname(){
+            return bookname;
+        }
+
+        public String getBookmonth(){
+            return bookmonth;
+        }
+
+        public String getBookprize(){
+            return bookprize;
+        }
+
+        public String getBookkind(){
+            return bookkind;
         }
     }
 

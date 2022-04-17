@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,14 +10,15 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.myapplication.databinding.FragmentFirstBinding;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -41,19 +41,27 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         LinearLayout linear=(LinearLayout) getView().findViewById(R.id.history_button_layout);
-        File dir = this.getActivity().getFilesDir();
-        File[] files = dir.listFiles();
-        for (int i = 1; i < files.length+1; i++){
-            String file_name = "test" + String.valueOf(i);
-            String str = read_tmp(dir, file_name);
+
+        File root = this.getActivity().getFilesDir();
+        File[] files = root.listFiles();
+
+        for (int i = 0; i < files.length; i++){
+            if(files[i].getName().equals("tmp") == true){
+                continue;
+            }
+            String file_path = files[i].getPath();
+            File file = new File(file_path);
+            String file_name = "book_information.txt";
+            String str = read_tmp(file, file_name);
+            String[] title = str.split("_");
             Button btn = new Button(getActivity());
-            btn.setText(str);
+            btn.setText(title[0] + " " + title[1]);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), Result.class);
                     Bundle bundle = new Bundle();
-                    bundle.putString("file_name", str);
+                    bundle.putString("result", title[1]);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
@@ -72,8 +80,7 @@ public class FirstFragment extends Fragment {
 
     public  String  read_tmp( File file, String name){
         File inFile = new File(file, name);
-        String str = "";
-        str = readFromFile(inFile);
+        String str = str = readFromFile(inFile);
         return str;
     }
 

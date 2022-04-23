@@ -8,15 +8,21 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class TCPClient_Waiting extends AppCompatActivity {
 
@@ -25,6 +31,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private Socket socket;
     private String fileName = "test";
     private int floderCount = 0;
+    private String folderName = "";
     private byte[] SendMsg = new byte[0];
     private String RecMsg = "";
     private final String serverip = "192.168.0.122";
@@ -53,7 +60,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
         Bundle test = this.getIntent().getExtras();
         floderCount = test.getInt("folderName");
         File dir = this.getFilesDir();
-        String folderName = dir.getPath() + "/" + String.valueOf(floderCount);
+        folderName = dir.getPath() + "/" + String.valueOf(floderCount);
         File folder = new File(folderName);
         byte[] tmp = read_tmp(folder, fileName);
         SendMsg = addBytes(SendMsg, tmp);
@@ -61,12 +68,14 @@ public class TCPClient_Waiting extends AppCompatActivity {
         TCPClientThread tcpClientThread = new TCPClientThread();
         Thread t = new Thread(tcpClientThread);
         t.start();
+        /*
         try {
             t.join();
         }
         catch (InterruptedException e){
             e.printStackTrace();
         }
+         */
 
         String bookname = Data.Book.bookname;
         String bookmonth = Data.Book.bookmonth;
@@ -74,13 +83,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
         String bookkind = Data.Book.bookkind;
 
 
-        Intent intent = new Intent(TCPClient_Waiting.this, Result.class);
-
-        Bundle bundle = new Bundle();
-        bundle.putString("result", RecMsg);
-        intent.putExtras(bundle);
-
-        startActivity(intent);
 
     }
 
@@ -94,33 +96,27 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private void setTcpConnect(){
         try {
             socket = new Socket(serverip,serverport);
-            socket.setSoTimeout(5000);
+            socket.setSoTimeout(10000);
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("123", String.valueOf(e));
         }
-        try {
-            pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8")), true);
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            //send(fileName);
-            send(SendMsg);
-            RecMsg = br.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        send(SendMsg);
+        System.out.println("already send");
+        getServerData();
         try{
-            pw.close();
-            br.close();
             socket.close();
         }
         catch (IOException e){
             e.printStackTrace();
         }
-        //System.out.println("RecMsg : " + RecMsg);
+        Intent intent = new Intent(TCPClient_Waiting.this, Result.class);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("result", RecMsg);
+        intent.putExtras(bundle);
+
+        startActivity(intent);
     }
 
     public static byte[] addBytes(byte[] data1, byte[] data2) {
@@ -168,6 +164,56 @@ public class TCPClient_Waiting extends AppCompatActivity {
         }
 
         return bytes;
+    }
+
+    public void getServerData(){
+        System.out.println("in get data");
+        int allImageLength = 0;
+        int score = 0;
+        int oneImageLength = 0;
+        int imageCount = 0;
+        try {
+            byte[] tmp = new byte[4];
+            int count = socket.getInputStream().read(tmp);
+            System.out.println(count);
+            allImageLength = ByteBuffer.wrap(tmp).getInt();
+            System.out.println("allImageLength = " + allImageLength);
+            socket.getInputStream().read(tmp);
+            score = ByteBuffer.wrap(tmp).getInt();
+            allImageLength -= 4;
+            System.out.println("score = " + score);
+            String scoreStr = "_" + String.valueOf(score);
+            File scorefile = new File(folderName + "/book_information.txt");
+            FileOutputStream outputStream;
+            try {
+                outputStream = new FileOutputStream(scorefile, true);
+                outputStream.write(scoreStr.getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
+                outputStream.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            while(allImageLength > 0){
+                socket.getInputStream().read(tmp);
+                oneImageLength = ByteBuffer.wrap(tmp).getInt();
+                allImageLength -= 4;
+                byte[] oneImage = new byte[oneImageLength];
+                System.out.println("oneImage = " + oneImage);
+                socket.getInputStream().read(oneImage);
+                allImageLength -= oneImageLength;
+                File imagefile = new File(folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
+                FileOutputStream fos = new FileOutputStream(imagefile);
+                System.out.println("oneImageLength = " + oneImageLength + ", oneImage.length = " + oneImage.length);
+                fos.write(oneImage, 0, oneImage.length);
+                fos.flush();
+                fos.close();
+                imageCount++;
+            }
+        } catch (EOFException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 }

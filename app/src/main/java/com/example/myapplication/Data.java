@@ -93,6 +93,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass2.setEnabled(true);
+            System.out.println("class1");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -103,6 +104,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass3.setEnabled(true);
+            System.out.println("class2");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -113,6 +115,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass4.setEnabled(true);
+            System.out.println("class3");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -123,6 +126,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass5.setEnabled(true);
+            System.out.println("class4");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -133,6 +137,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass6.setEnabled(true);
+            System.out.println("class5");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -143,6 +148,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             ButtonPageClass7.setEnabled(true);
+            System.out.println("class6");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -153,6 +159,7 @@ public class Data extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             to_tcpclientwaiting_page.setEnabled(true);
+            System.out.println("class7");
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -162,12 +169,6 @@ public class Data extends AppCompatActivity {
             Intent intent = new Intent(Data.this, TCPClient_Waiting.class);
 
             Book book = getBookInformation();
-
-            //Bundle bundle = new Bundle();
-            //bundle.putString("test", test.getText().toString());
-            //System.out.println(Sendmsg.length);
-            //bundle.putByteArray("allphoto", Sendmsg);
-            //intent.putExtras(bundle);
 
             File dir = this.getFilesDir();
             File[] files = dir.listFiles();
@@ -245,7 +246,7 @@ public class Data extends AppCompatActivity {
                 String photo_path = saveBitmap(bm, 0);
                 File file = new File(photo_path);
                 int file_size = 4 + (int)file.length();
-                byte[] imagedatas = new byte[file_size + 4];
+                byte[] imagedatas = new byte[4 + file_size];
                 byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
                 System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
                 int count = 4;
@@ -256,11 +257,13 @@ public class Data extends AppCompatActivity {
                     System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
                     count += 4;
                     input.read(imagedata);
+                    System.out.println(String.valueOf(0) + "  imagedata : " + imagedata.length);
                     System.arraycopy(imagedata, 0, imagedatas, count, (int)file.length());
                 }catch (IOException e){
                     e.printStackTrace();
                 }
                 Sendmsg = addBytes(Sendmsg, imagedatas);
+                System.out.println(Sendmsg.length);
             }
             else{
                 if (resultData.getClipData() != null){
@@ -272,11 +275,11 @@ public class Data extends AppCompatActivity {
                         String photo_path = saveBitmap(bm, j);
 
                         File file = new File(photo_path);
-                        System.out.println("one photo size : " + file.length());
                         file_size += file.length();
                     }
                     byte[] imagedatas = new byte[file_size + 4];
                     byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
+                    System.out.println("imagedatas : " + imagedatas.length);
                     System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
 
                     int count = 4;
@@ -288,6 +291,7 @@ public class Data extends AppCompatActivity {
                             FileInputStream input = new FileInputStream(file.getAbsolutePath());
                             byte[] imagedata = new byte[(int)file.length()];
                             byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();
+                            System.out.println(String.valueOf(i) + "  imagedata : " + imagedata.length);
                             System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
                             count += 4;
                             input.read(imagedata);
@@ -298,6 +302,7 @@ public class Data extends AppCompatActivity {
                         }
                     }
                     Sendmsg = addBytes(Sendmsg, imagedatas);
+                    System.out.println(Sendmsg.length);
                 }
             }
         }
@@ -377,15 +382,18 @@ public class Data extends AppCompatActivity {
         int width = options.outWidth, height = options.outHeight;
 
         // 將圖檔等比例縮小至寬度為512
-        final int MAX_WIDTH = 512;
-        float resize = 1; // 縮小值 resize 可為任意小數
-        if(width>MAX_WIDTH){
-            resize = ((float) MAX_WIDTH) / width;
+        final int MAX_SIZE = 512;
+        float resize_width = 1, resize_heigth = 1; // 縮小值 resize 可為任意小數
+        if(width>MAX_SIZE){
+            resize_width = ((float) MAX_SIZE) / width;
+        }
+        if(height>MAX_SIZE){
+            resize_heigth = ((float) MAX_SIZE) / height;
         }
 
         // 產生縮圖需要的參數 matrix
         Matrix matrix = new Matrix();
-        matrix.postScale(resize, resize); // 設定寬高的縮放比例
+        matrix.postScale(resize_width, resize_heigth); // 設定寬高的縮放比例
 
         // 產生縮小後的圖
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);

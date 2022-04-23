@@ -137,7 +137,7 @@
                 android:id="@+id/ButtonPageClass3"
                 android:layout_width="112dp"
                 android:layout_height="39dp"
-                android:text="書背接縫處*2"
+                android:text="書背接縫*2"
                 android:textSize="13dp" />
 
             <Button

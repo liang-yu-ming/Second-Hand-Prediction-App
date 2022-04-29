@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,6 +43,7 @@ public class Data extends AppCompatActivity {
 
     public static final int READ_REQUEST_CODE = 1;
     private byte[] Sendmsg = new byte[0];
+    //private ByteArrayOutputStream Imagemsg = ByteArrayOutputStream();
     public String current_folder_name = "";
 
     @Override
@@ -480,6 +482,10 @@ public class Data extends AppCompatActivity {
                 ;
             }
         }
+    }
+
+    public void packetSendMsg(){
+
     }
 
     public void write_string(File file, String name, String input){

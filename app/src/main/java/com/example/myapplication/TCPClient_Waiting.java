@@ -96,7 +96,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private void setTcpConnect(){
         try {
             socket = new Socket(serverip,serverport);
-            socket.setSoTimeout(10000);
+            socket.setSoTimeout(10000000);
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("123", String.valueOf(e));
@@ -168,21 +168,38 @@ public class TCPClient_Waiting extends AppCompatActivity {
 
     public void getServerData(){
         System.out.println("in get data");
-        int allImageLength = 0;
-        int score = 0;
-        int oneImageLength = 0;
         int imageCount = 0;
         try {
-            byte[] tmp = new byte[4];
-            int count = socket.getInputStream().read(tmp);
-            System.out.println(count);
-            allImageLength = ByteBuffer.wrap(tmp).getInt();
-            System.out.println("allImageLength = " + allImageLength);
-            socket.getInputStream().read(tmp);
-            score = ByteBuffer.wrap(tmp).getInt();
-            allImageLength -= 4;
-            System.out.println("score = " + score);
-            String scoreStr = "_" + String.valueOf(score);
+            byte[] frame =  new byte[1024];
+            byte[] data = new byte[0];
+            byte[] current_data;
+            while (data.length < 4){
+                int current_rec = socket.getInputStream().read(frame);
+                current_data = new byte[current_rec];
+                System.arraycopy(frame, 0, current_data, 0,current_rec);
+                data = addBytes(data, current_data);
+            }
+            byte[] alldatalength_byte = new byte[4];
+            System.arraycopy(data, 0, alldatalength_byte, 0,alldatalength_byte.length);
+            data = cliparray(data, 4);
+            int alldatalength_int = ByteBuffer.wrap(alldatalength_byte).getInt();
+            System.out.println("alldatalength = " + alldatalength_int);
+
+            while (data.length < 4){
+                int current_rec = socket.getInputStream().read(frame);
+                current_data = new byte[current_rec];
+                System.arraycopy(frame, 0, current_data, 0,current_rec);
+                data = addBytes(data, current_data);
+            }
+            byte[] score_byte = new byte[4];
+            System.arraycopy(data, 0, score_byte, 0,score_byte.length);
+            //System.arraycopy(data, 4, data, 0, data.length - 4);
+            data = cliparray(data, 4);
+            int score_int = ByteBuffer.wrap(score_byte).getInt();
+            System.out.println("score = " + score_int);
+            alldatalength_int -= 4;
+            System.out.println("alldatalength = " + alldatalength_int);
+            String scoreStr = "_" + String.valueOf(score_int);
             File scorefile = new File(folderName + "/book_information.txt");
             FileOutputStream outputStream;
             try {
@@ -193,18 +210,38 @@ public class TCPClient_Waiting extends AppCompatActivity {
             }catch (IOException e){
                 e.printStackTrace();
             }
-            while(allImageLength > 0){
-                socket.getInputStream().read(tmp);
-                oneImageLength = ByteBuffer.wrap(tmp).getInt();
-                allImageLength -= 4;
-                byte[] oneImage = new byte[oneImageLength];
-                System.out.println("oneImage = " + oneImage);
-                socket.getInputStream().read(oneImage);
-                allImageLength -= oneImageLength;
+
+            while (alldatalength_int > 0){
+                while (data.length < 4){
+                    int current_rec = socket.getInputStream().read(frame);
+                    current_data = new byte[current_rec];
+                    System.arraycopy(frame, 0, current_data, 0,current_rec);
+                    data = addBytes(data, current_data);
+                }
+                byte[] oneimagelength_byte = new byte[4];
+                System.arraycopy(data, 0, oneimagelength_byte, 0,oneimagelength_byte.length);
+                //System.arraycopy(data, 4,data, 0, data.length - 4);
+                data = cliparray(data, 4);
+                int oneimagelength_int = ByteBuffer.wrap(oneimagelength_byte).getInt();
+                System.out.println("one image length = " + oneimagelength_int);
+                alldatalength_int -= 4;
+                System.out.println("alldatalength = " + alldatalength_int);
+                while (data.length < oneimagelength_int){
+                    int current_rec = socket.getInputStream().read(frame);
+                    current_data = new byte[current_rec];
+                    System.arraycopy(frame, 0, current_data, 0,current_rec);
+                    data = addBytes(data, current_data);
+                }
+                byte[] oneimage = new byte[oneimagelength_int];
+                System.arraycopy(data, 0, oneimage, 0,oneimage.length);
+                //System.arraycopy(data, oneimage.length, data, 0, data.length - oneimage.length);
+                data = cliparray(data, oneimage.length);
+                alldatalength_int -= oneimagelength_int;
+                System.out.println("qwe alldatalength = " + alldatalength_int);
+
                 File imagefile = new File(folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
                 FileOutputStream fos = new FileOutputStream(imagefile);
-                System.out.println("oneImageLength = " + oneImageLength + ", oneImage.length = " + oneImage.length);
-                fos.write(oneImage, 0, oneImage.length);
+                fos.write(oneimage, 0, oneimage.length);
                 fos.flush();
                 fos.close();
                 imageCount++;
@@ -214,6 +251,12 @@ public class TCPClient_Waiting extends AppCompatActivity {
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public byte[] cliparray(byte[] array, int x){
+        byte[] array1 = new byte[array.length-x];
+        System.arraycopy(array, x,array1, 0, array1.length);
+        return array1;
     }
 
 }

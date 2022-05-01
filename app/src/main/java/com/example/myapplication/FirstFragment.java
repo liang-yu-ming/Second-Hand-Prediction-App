@@ -46,7 +46,6 @@ public class FirstFragment extends Fragment {
         File[] files = root.listFiles();
 
         for (int i = 0; i < files.length; i++){
-            System.out.println("for loop");
             if(files[i].getName().equals("tmp") == true){
                 continue;
             }
@@ -62,13 +61,13 @@ public class FirstFragment extends Fragment {
                 public void onClick(View v) {
                     Intent intent = new Intent(getActivity(), Result.class);
                     Bundle bundle = new Bundle();
-                    bundle.putString("result", title[1]);
+                    bundle.putString("from", "FirstFragment");
+                    bundle.putString("folder_path", file_path);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
             });
             linear.addView(btn);
-            //tem.out.println(str);
         }
     }
 

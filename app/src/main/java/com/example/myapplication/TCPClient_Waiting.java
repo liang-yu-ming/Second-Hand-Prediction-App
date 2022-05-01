@@ -79,7 +79,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
         TCPClientThread tcpClientThread = new TCPClientThread();
         Thread t = new Thread(tcpClientThread);
         t.start();
-
     }
 
     private class TCPClientThread implements Runnable{
@@ -108,7 +107,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
         Intent intent = new Intent(TCPClient_Waiting.this, Result.class);
 
         Bundle bundle = new Bundle();
-        bundle.putString("result", RecMsg);
+        bundle.putString("folder_path", folderName);
+        bundle.putString("from", "TCPClient_Waiting");
         intent.putExtras(bundle);
         reptile();
         calculatePrice();
@@ -179,7 +179,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.arraycopy(data, 0, alldatalength_byte, 0,alldatalength_byte.length);
             data = cliparray(data, 4);
             int alldatalength_int = ByteBuffer.wrap(alldatalength_byte).getInt();
-
+            System.out.println("ImageMsg length = " + alldatalength_int);
             while (data.length < 4){
                 int current_rec = socket.getInputStream().read(frame);
                 current_data = new byte[current_rec];
@@ -188,7 +188,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             }
             byte[] score_byte = new byte[4];
             System.arraycopy(data, 0, score_byte, 0,score_byte.length);
-            //System.arraycopy(data, 4, data, 0, data.length - 4);
             data = cliparray(data, 4);
             int score_int = ByteBuffer.wrap(score_byte).getInt();
             score = score_int;
@@ -215,21 +214,19 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 }
                 byte[] oneimagelength_byte = new byte[4];
                 System.arraycopy(data, 0, oneimagelength_byte, 0,oneimagelength_byte.length);
-                //System.arraycopy(data, 4,data, 0, data.length - 4);
                 data = cliparray(data, 4);
                 int oneimagelength_int = ByteBuffer.wrap(oneimagelength_byte).getInt();
                 System.out.println("one image length = " + oneimagelength_int);
                 alldatalength_int -= 4;
                 while (data.length < oneimagelength_int){
                     int current_rec = socket.getInputStream().read(frame);
-                    //System.out.println("current_rec = " + current_rec);
                     current_data = new byte[current_rec];
                     System.arraycopy(frame, 0, current_data, 0,current_rec);
                     data = addBytes(data, current_data);
+                    System.out.println("length = " + data.length);
                 }
                 byte[] oneimage = new byte[oneimagelength_int];
                 System.arraycopy(data, 0, oneimage, 0,oneimage.length);
-                //System.arraycopy(data, oneimage.length, data, 0, data.length - oneimage.length);
                 data = cliparray(data, oneimage.length);
                 alldatalength_int -= oneimagelength_int;
 
@@ -270,7 +267,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.out.println("in other");
             discount = 0.95 * Math.log(CTR) * depreciation / age;
         }
-        discount = Math.round(discount*100.0)/100.0;
+        discount = (float)Math.round(discount*100.0)/100.0;
         System.out.println("discount = " + discount);
         if(bookprize.equals("$")){
             t = "_" + String.valueOf(0) + "_" + String.valueOf(discount);

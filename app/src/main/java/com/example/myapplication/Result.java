@@ -3,34 +3,70 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Result extends AppCompatActivity {
+
+    private String folderPath = "";
+    private int i=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
-        Bundle test = this.getIntent().getExtras();
-        String input = test.getString("result");
-        //System.out.println("input: " + test.getString("test"));
+        Bundle bundle = this.getIntent().getExtras();
+        String fromActivity = bundle.getString("from");
+        System.out.println("fromActivity = " + fromActivity);
+        folderPath = bundle.getString("folder_path");
 
-        File dir = this.getFilesDir();
-        //System.out.println(this.getFilesDir());
-        //write_tmp(dir, "test1", "tmp1");
-        File[] files = dir.listFiles();
-        int count = files.length;
-        String filename = "test" + String.valueOf(count+1);
-        //System.out.println("filename: " + filename);
-        //write_tmp(dir, filename, input);
+        String bookInfor = readFromFile(folderPath, "book_information.txt");
+        String[] bookInforSplit = bookInfor.split("_");
+        String bookName = bookInforSplit[1];
+        bookName = bookName.replace("\"", "");
+        String score = bookInforSplit[5];
+        String originalPriceStr = bookInforSplit[6];
+        originalPriceStr = originalPriceStr.replace("$","");
+        String discountStr = bookInforSplit[7];
+        int originalPriceInt = Integer.valueOf(originalPriceStr);
+        double discountInt = Double.valueOf(discountStr);
 
+        TextView bookNameText = (TextView) findViewById(R.id.Title);
+        bookNameText.setText(bookName);
+
+        TextView scoreText = (TextView) findViewById(R.id.Grade);
+        scoreText.setText(score);
+
+        TextView discountText = (TextView) findViewById(R.id.Propotion);
+        discountText.setText(discountStr);
+
+        TextView predictPriceText = (TextView) findViewById(R.id.Price);
+        if(originalPriceInt == 0){
+            predictPriceText.setText("未輸入原始價格");
+        }else {
+            String predictPriceStr = String.valueOf(originalPriceInt * discountInt);
+            predictPriceText.setText(predictPriceStr);
+        }
 
         Button to_main_page = (Button) findViewById(R.id.button4);
         to_main_page.setOnClickListener(new View.OnClickListener() {
@@ -46,30 +82,106 @@ public class Result extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Result.this, Result_second.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("folder_path", folderPath);
+                intent.putExtras(bundle);
                 startActivity(intent);
+            }
+        });
+
+        ImageView tv = (ImageView)findViewById(R.id.imageView);
+        Button next_image = (Button) findViewById(R.id.button2);
+        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(0) + ".png");
+        BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
+        tv.setImageDrawable(bmpDraw);
+        i++ ;
+
+        next_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (i) {
+                    case 0:
+                        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
+                        tv.setImageDrawable(bmpDraw); i++ ;break;
+                    case 1:
+                        Bitmap bmp1 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw1=new BitmapDrawable(bmp1);
+                        tv.setImageDrawable(bmpDraw1); i++ ;break;
+                    case 2:
+                        Bitmap bmp2 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw2=new BitmapDrawable(bmp2);
+                        tv.setImageDrawable(bmpDraw2); i++ ;break;
+                    case 3:
+                        Bitmap bmp3 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw3=new BitmapDrawable(bmp3);
+                        tv.setImageDrawable(bmpDraw3); i++ ;break;
+                    case 4:
+                        Bitmap bmp4 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw4=new BitmapDrawable(bmp4);
+                        tv.setImageDrawable(bmpDraw4); i++ ;break;
+                    case 5:
+                        Bitmap bmp5 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw5=new BitmapDrawable(bmp5);
+                        tv.setImageDrawable(bmpDraw5); i++ ;break;
+                    case 6:
+                        Bitmap bmp6 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw6=new BitmapDrawable(bmp6);
+                        tv.setImageDrawable(bmpDraw6); i++ ;break;
+                    case 7:
+                        Bitmap bmp7 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw7=new BitmapDrawable(bmp7);
+                        tv.setImageDrawable(bmpDraw7); i++ ;break;
+                    case 8:
+                        Bitmap bmp8 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw8=new BitmapDrawable(bmp8);
+                        tv.setImageDrawable(bmpDraw8); i++ ;break;
+                    case 9:
+                        Bitmap bmp9 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw9=new BitmapDrawable(bmp9);
+                        tv.setImageDrawable(bmpDraw9); i++ ;break;
+                    case 10:
+                        Bitmap bmp10 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw10=new BitmapDrawable(bmp10);
+                        tv.setImageDrawable(bmpDraw10); i++ ;break;
+                    case 11:
+                        Bitmap bmp11 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw11=new BitmapDrawable(bmp11);
+                        tv.setImageDrawable(bmpDraw11); i++ ;break;
+                    case 12:
+                        Bitmap bmp12 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw12=new BitmapDrawable(bmp12);
+                        tv.setImageDrawable(bmpDraw12); i++ ;break;
+                    case 13:
+                        Bitmap bmp13 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
+                        BitmapDrawable bmpDraw13=new BitmapDrawable(bmp13);
+                        tv.setImageDrawable(bmpDraw13); i++ ;break;
+                }
+                if(i >= 14)
+                    i = 0;
             }
         });
     }
 
-    public  void  write_tmp( File file, String name, String input){
-        File outFile = new File(file, name);
-        writeToFile(outFile, input);
-    }
+    private String readFromFile(String folderName, String fileName){
+        String path = folderName + "/" + fileName;
+        String fileAsString = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line = br.readLine();
+            StringBuilder sb = new StringBuilder();
 
-    private void writeToFile(File fout, String data) {
-        FileOutputStream osw = null;
-        try {
-            osw = new FileOutputStream(fout);
-            osw.write(data.getBytes());
-            osw.flush();
-        } catch (Exception e) {
-            ;
-        } finally {
-            try {
-                osw.close();
-            } catch (Exception e) {
-                ;
+            while (line != null) {
+                sb.append(line).append("\n");
+                line = br.readLine();
             }
+
+            fileAsString = sb.toString();
+            System.out.println(fileAsString);
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
         }
+        return fileAsString;
     }
 }

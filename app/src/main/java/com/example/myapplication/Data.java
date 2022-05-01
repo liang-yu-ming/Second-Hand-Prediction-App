@@ -416,7 +416,6 @@ public class Data extends AppCompatActivity {
 
     private void packetSendMsg(){
         int ImageMsgSize = Imagemsg.size();
-        System.out.println("ImageMsg length = " + ImageMsgSize);
         byte[] ImageMsgtoByte = Imagemsg.toByteArray();
         byte[] allImageLength = ByteBuffer.allocate(4).putInt(ImageMsgSize).array();//宣告長度為4的byte array紀錄整個封包的長度
         Sendmsg = addBytes(allImageLength, ImageMsgtoByte);

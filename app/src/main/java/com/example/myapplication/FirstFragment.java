@@ -46,6 +46,7 @@ public class FirstFragment extends Fragment {
         File[] files = root.listFiles();
 
         for (int i = 0; i < files.length; i++){
+            System.out.println("for loop");
             if(files[i].getName().equals("tmp") == true){
                 continue;
             }

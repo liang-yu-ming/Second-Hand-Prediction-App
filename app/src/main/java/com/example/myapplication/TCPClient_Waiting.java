@@ -2,45 +2,54 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TCPClient_Waiting extends AppCompatActivity {
 
     private PrintWriter pw;
     private BufferedReader br;
     private Socket socket;
-    private String fileName = "test";
+    private String fileName = "packet";
     private int floderCount = 0;
     private String folderName = "";
     private byte[] SendMsg = new byte[0];
     private String RecMsg = "";
     private final String serverip = "192.168.0.122";
     private final int serverport = 5422;
-
-    //private void send(String msg){
-    //    pw.println(msg);
-    //    pw.flush();
-    //}
+    private String bookname = Data.Book.bookname;
+    private String bookmonth = Data.Book.bookmonth;
+    private String bookprize = Data.Book.bookprize;
+    private String bookkind = Data.Book.bookkind;
+    private int score = 0;
+    private int CTR = 0;
 
     public void send(byte[] msg){
         try {
@@ -68,21 +77,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
         TCPClientThread tcpClientThread = new TCPClientThread();
         Thread t = new Thread(tcpClientThread);
         t.start();
-        /*
-        try {
-            t.join();
-        }
-        catch (InterruptedException e){
-            e.printStackTrace();
-        }
-         */
-
-        String bookname = Data.Book.bookname;
-        String bookmonth = Data.Book.bookmonth;
-        String bookprize = Data.Book.bookprize;
-        String bookkind = Data.Book.bookkind;
-
-
 
     }
 
@@ -115,6 +109,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString("result", RecMsg);
         intent.putExtras(bundle);
+        reptile();
+        //calculatePrice(bookname, bookmonth, bookprize, bookkind, score);
 
         startActivity(intent);
     }
@@ -196,6 +192,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
             //System.arraycopy(data, 4, data, 0, data.length - 4);
             data = cliparray(data, 4);
             int score_int = ByteBuffer.wrap(score_byte).getInt();
+            score = score_int;
             System.out.println("score = " + score_int);
             alldatalength_int -= 4;
             System.out.println("alldatalength = " + alldatalength_int);
@@ -228,6 +225,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 System.out.println("alldatalength = " + alldatalength_int);
                 while (data.length < oneimagelength_int){
                     int current_rec = socket.getInputStream().read(frame);
+                    //System.out.println("current_rec = " + current_rec);
                     current_data = new byte[current_rec];
                     System.arraycopy(frame, 0, current_data, 0,current_rec);
                     data = addBytes(data, current_data);
@@ -240,6 +238,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 System.out.println("qwe alldatalength = " + alldatalength_int);
 
                 File imagefile = new File(folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
+                System.out.println("get path "+ folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
                 FileOutputStream fos = new FileOutputStream(imagefile);
                 fos.write(oneimage, 0, oneimage.length);
                 fos.flush();
@@ -258,5 +257,89 @@ public class TCPClient_Waiting extends AppCompatActivity {
         System.arraycopy(array, x,array1, 0, array1.length);
         return array1;
     }
+/*
+    public void calculatePrice(String bookname, String bookmonth, String bookprize, String bookkind, int score){
+        //bookname丟爬蟲
+        String[] time = bookmonth.split("-");
+        int age =  Integer.valueOf(time[0]);
+        double depreciation = 1 / score;
+        double discount = 0;
+        String t = "";
+        if(bookkind.equals("文學小說") || bookkind.equals("人文史地")){
+            discount = Math.pow(1.5, 2 + depreciation + age);
+        } else {
+            discount = 0.95 * depreciation / age;
+        }
+        discount = Math.round(discount*100.0)/100.0;
+        if(bookprize.equals("$")){
+            t = String.valueOf(0) + "_" + String.valueOf(discount);
+        }
+        else {
+            t = bookprize + "_" + String.valueOf(discount);
+        }
+        File dir = new File(folderName);
+        String index = "book_information.txt";
+        write_string(dir, index, t);
+    }
 
+    public void write_string(File file, String name, String input){
+        File outFile = new File(file, name);
+        FileOutputStream outputStream;
+        try {
+            outputStream = new FileOutputStream(outFile, true);
+            outputStream.write(input.getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+            outputStream.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+ */
+    public void reptile(){
+        String tmp = "";
+        if(isNetworkAvailable(this)){
+            String NetUrl = "https://www.google.com/search?q=" + "哈利波特";
+            System.out.println("Url = " + NetUrl);
+            Connection conn = Jsoup.connect(NetUrl);
+            conn.header("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36");
+            try {
+                final Document docs = conn.get();
+                tmp = docs.select("div[id=result-stats]").text();
+                System.out.println("tmp = " + tmp);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }else {
+            System.out.println("Network error");
+        }
+        String[] tmpSplit = tmp.split(" ");
+        NumberFormat format = NumberFormat.getInstance(Locale.US);
+        Number number = 0;
+        try {
+            number = format.parse(tmpSplit[1]);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        CTR = number.intValue();
+        System.out.println("CTR = " + CTR);
+    }
+
+    public boolean isNetworkAvailable(Activity activity){
+        Context context = activity.getApplicationContext();
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) ;
+        if(cm == null)
+            return false;
+        else {
+            NetworkInfo[] networkInfo = cm.getAllNetworkInfo();
+            if (networkInfo != null && networkInfo.length > 0){
+                for (int i = 0;i < networkInfo.length; i++)
+                    if(networkInfo[i].getState() == NetworkInfo.State.CONNECTED)
+                        return  true;
+            }
+        }
+        return false;
+    }
 }

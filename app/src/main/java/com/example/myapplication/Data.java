@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -11,20 +12,28 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -37,35 +46,47 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Data extends AppCompatActivity {
 
     public static final int READ_REQUEST_CODE = 1;
+    private int buttonCalled = 0;
     private byte[] Sendmsg = new byte[0];
-    //private ByteArrayOutputStream Imagemsg = ByteArrayOutputStream();
+    private ByteArrayOutputStream Imagemsg = new ByteArrayOutputStream();
     public String current_folder_name = "";
+    public int photocount = 0;
+
+    Button ButtonPageClass1;
+    Button ButtonPageClass2;
+    Button ButtonPageClass3;
+    Button ButtonPageClass4;
+    Button ButtonPageClass5;
+    Button ButtonPageClass6;
+    Button ButtonPageClass7;
+    Button to_tcpclientwaiting_page;
+    EditText mEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
-
-        Button ButtonPageClass1 = (Button) findViewById(R.id.ButtonPageClass1);
-        Button ButtonPageClass2 = (Button) findViewById(R.id.ButtonPageClass2);
-        Button ButtonPageClass3 = (Button) findViewById(R.id.ButtonPageClass3);
-        Button ButtonPageClass4 = (Button) findViewById(R.id.ButtonPageClass4);
-        Button ButtonPageClass5 = (Button) findViewById(R.id.ButtonPageClass5);
-        Button ButtonPageClass6 = (Button) findViewById(R.id.ButtonPageClass6);
-        Button ButtonPageClass7 = (Button) findViewById(R.id.ButtonPageClass7);
-        Button to_tcpclientwaiting_page = (Button) findViewById(R.id.ButtonSend);
+        ButtonPageClass2 = (Button) findViewById(R.id.ButtonPageClass2);
+        ButtonPageClass3 = (Button) findViewById(R.id.ButtonPageClass3);
+        ButtonPageClass1 = (Button) findViewById(R.id.ButtonPageClass1);
+        ButtonPageClass4 = (Button) findViewById(R.id.ButtonPageClass4);
+        ButtonPageClass5 = (Button) findViewById(R.id.ButtonPageClass5);
+        ButtonPageClass6 = (Button) findViewById(R.id.ButtonPageClass6);
+        ButtonPageClass7 = (Button) findViewById(R.id.ButtonPageClass7);
+        to_tcpclientwaiting_page = (Button) findViewById(R.id.ButtonSend);
         ButtonPageClass2.setEnabled(false);
         ButtonPageClass3.setEnabled(false);
         ButtonPageClass4.setEnabled(false);
         ButtonPageClass5.setEnabled(false);
         ButtonPageClass6.setEnabled(false);
         ButtonPageClass7.setEnabled(false);
-        //to_tcpclientwaiting_page.setEnabled(false);
+        to_tcpclientwaiting_page.setEnabled(false);
 
         boolean externalHasGone = false;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -89,13 +110,33 @@ public class Data extends AppCompatActivity {
             }
         };
 
+        mEditText = (EditText) findViewById(R.id.EditTextBookMonth);
+        mEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    showDatePickDlg();
+                    return true;
+                }
+                return false;
+            }
+        });
+        mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    showDatePickDlg();
+                }
+            }
+        });
+
         ButtonPageClass1.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass2.setEnabled(true);
             System.out.println("class1");
+            buttonCalled = 1;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -105,8 +146,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass3.setEnabled(true);
             System.out.println("class2");
+            buttonCalled = 2;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -116,8 +157,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass4.setEnabled(true);
             System.out.println("class3");
+            buttonCalled = 3;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -127,8 +168,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass5.setEnabled(true);
             System.out.println("class4");
+            buttonCalled = 4;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -138,8 +179,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass6.setEnabled(true);
             System.out.println("class5");
+            buttonCalled = 5;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -149,8 +190,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            ButtonPageClass7.setEnabled(true);
             System.out.println("class6");
+            buttonCalled = 6;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -160,8 +201,8 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            to_tcpclientwaiting_page.setEnabled(true);
             System.out.println("class7");
+            buttonCalled = 7;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
         });
@@ -176,12 +217,14 @@ public class Data extends AppCompatActivity {
             File[] files = dir.listFiles();
             int filesCount = files.length;
 
+            //創建一個資料夾，用來存放一本書的圖片和資訊
             String folder_name = dir.getPath() + "/" + String.valueOf(filesCount);
             current_folder_name = folder_name;
             File folder = new File(folder_name);
             if(!folder.exists())
                 folder.mkdir();
 
+            //將tmp中的圖片移至上述資料夾中
             String folder_tmp_name = dir.getPath() + "/tmp";
             File folder_tmp = new File(folder_tmp_name);
             File[] photo_files = folder_tmp.listFiles();
@@ -194,8 +237,8 @@ public class Data extends AppCompatActivity {
                 }
             }
 
-
-            String fileName = "test";
+            packetSendMsg();//將封包封進SendMsg中
+            String fileName = "packet";
             write_byte(folder, fileName, Sendmsg);
             Bundle bundle = new Bundle();
             bundle.putInt("folderName", filesCount);
@@ -245,71 +288,73 @@ public class Data extends AppCompatActivity {
                 Uri selectedImage = resultData.getData();
                 String filePath =  getImageAbsolutePath(this, selectedImage);
                 Bitmap bm = getResizedBitmap(filePath);
-                String photo_path = saveBitmap(bm, 0);
-                File file = new File(photo_path);
-                int file_size = 4 + (int)file.length();
-                byte[] imagedatas = new byte[4 + file_size];
-                byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
-                System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
-                int count = 4;
+                String photo_path = saveBitmap(bm, photocount);
+                photocount++;
+                File file = new File(photo_path);//取出512*512圖片的位置
                 try{
                     FileInputStream input = new FileInputStream(file.getAbsolutePath());
-                    byte[] imagedata = new byte[(int)file.length()];
-                    byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();
-                    System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
-                    count += 4;
-                    input.read(imagedata);
-                    System.out.println(String.valueOf(0) + "  imagedata : " + imagedata.length);
-                    System.arraycopy(imagedata, 0, imagedatas, count, (int)file.length());
+                    byte[] oneimagedata = new byte[(int)file.length()];//宣告imagedata來存放圖片的內容
+                    byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
+                    input.read(oneimagedata);//將圖片內容放進oneimagedata
+                    Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
+                    Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
                 }catch (IOException e){
                     e.printStackTrace();
                 }
-                Sendmsg = addBytes(Sendmsg, imagedatas);
-                System.out.println(Sendmsg.length);
             }
             else{
                 if (resultData.getClipData() != null){
-                    int file_size = resultData.getClipData().getItemCount() * 4;
-                    for (int j = 0; j < resultData.getClipData().getItemCount(); j++){
-                        Uri selectedImages = resultData.getClipData().getItemAt(j).getUri();
+                    for (int i = 0; i < resultData.getClipData().getItemCount(); i++){
+                        Uri selectedImages = resultData.getClipData().getItemAt(i).getUri();
                         String filePath =  getImageAbsolutePath(this, selectedImages);
                         Bitmap bm = getResizedBitmap(filePath);
-                        String photo_path = saveBitmap(bm, j);
-
+                        String photo_path = saveBitmap(bm, photocount);
+                        photocount++;
                         File file = new File(photo_path);
-                        file_size += file.length();
-                    }
-                    byte[] imagedatas = new byte[file_size + 4];
-                    byte[] allImageLength = ByteBuffer.allocate(4).putInt(file_size).array();
-                    System.out.println("imagedatas : " + imagedatas.length);
-                    System.arraycopy(allImageLength, 0, imagedatas, 0, 4);
-
-                    int count = 4;
-                    File folder_tmp = new File(this.getFilesDir().getPath() + "/tmp");
-                    File[] photo_files = folder_tmp.listFiles();
-                    for(int i = 0; i < photo_files.length; i++){
-                        File file = new File(photo_files[i].getPath());
-                        try{
-                            FileInputStream input = new FileInputStream(file.getAbsolutePath());
-                            byte[] imagedata = new byte[(int)file.length()];
-                            byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();
-                            System.out.println(String.valueOf(i) + "  imagedata : " + imagedata.length);
-                            System.arraycopy(oneImageLength, 0, imagedatas, count, 4);
-                            count += 4;
-                            input.read(imagedata);
-                            System.arraycopy(imagedata, 0, imagedatas, count, (int)file.length());
-                            count += (int)file.length();
+                        try {
+                            FileInputStream input = new FileInputStream(file.getAbsolutePath());//取得圖片流
+                            byte[] oneimagedata = new byte[(int)file.length()];//宣告一個byte array用來存放一張圖片
+                            byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
+                            input.read(oneimagedata);//將圖片內容放進oneimagedata
+                            Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
+                            Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
                         }catch (IOException e){
                             e.printStackTrace();
                         }
                     }
-                    Sendmsg = addBytes(Sendmsg, imagedatas);
-                    System.out.println(Sendmsg.length);
                 }
             }
+            switch (buttonCalled){
+                case 1:
+                    ButtonPageClass1.setText("Already!");
+                    ButtonPageClass2.setEnabled(true);
+                    break;
+                case 2:
+                    ButtonPageClass2.setText("Already!");
+                    ButtonPageClass3.setEnabled(true);
+                    break;
+                case 3:
+                    ButtonPageClass3.setText("Already!");
+                    ButtonPageClass4.setEnabled(true);
+                    break;
+                case 4:
+                    ButtonPageClass4.setText("Already!");
+                    ButtonPageClass5.setEnabled(true);
+                    break;
+                case 5:
+                    ButtonPageClass5.setText("Already!");
+                    ButtonPageClass6.setEnabled(true);
+                    break;
+                case 6:
+                    ButtonPageClass6.setText("Already!");
+                    ButtonPageClass7.setEnabled(true);
+                    break;
+                case 7:
+                    ButtonPageClass7.setText("Already!");
+                    to_tcpclientwaiting_page.setEnabled(true);
+                    break;
+            }
         }
-        Button to_album = (Button) findViewById(R.id.ButtonPageClass1);
-        to_album.setText("already selected");
     }
 
     @TargetApi(19)
@@ -375,6 +420,14 @@ public class Data extends AppCompatActivity {
         return null;
     }
 
+    private void packetSendMsg(){
+        int ImageMsgSize = Imagemsg.size();
+        System.out.println("ImageMsg length = " + ImageMsgSize);
+        byte[] ImageMsgtoByte = Imagemsg.toByteArray();
+        byte[] allImageLength = ByteBuffer.allocate(4).putInt(ImageMsgSize).array();//宣告長度為4的byte array紀錄整個封包的長度
+        Sendmsg = addBytes(allImageLength, ImageMsgtoByte);
+    }
+
     private Bitmap getResizedBitmap(String imagePath) {
         // 取得原始圖檔的bitmap與寬高
 
@@ -411,6 +464,7 @@ public class Data extends AppCompatActivity {
             if(!folder.exists())
                 folder.mkdir();
             photo_name = folder_name + "/photo" + String.valueOf(count) + ".png";
+            System.out.println("save path = " + photo_name);
             fOut = new FileOutputStream(new File(photo_name));
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
             try {
@@ -435,6 +489,8 @@ public class Data extends AppCompatActivity {
         while (inputStream.read(data) != -1) {
             outputStream.write(data);
         }
+        System.out.println("copy old path = " + oldFilePath);
+        System.out.println("copy new path = " + newFilePath);
         inputStream.close();
         outputStream.close();
     }
@@ -482,10 +538,6 @@ public class Data extends AppCompatActivity {
                 ;
             }
         }
-    }
-
-    public void packetSendMsg(){
-
     }
 
     public void write_string(File file, String name, String input){
@@ -553,8 +605,9 @@ public class Data extends AppCompatActivity {
         EditText BookName = (EditText) findViewById(R.id.EditTextBookName); //取得BookName的參考
         String name = BookName.getText().toString(); //取得書籍名稱
 
-        EditText BookMonth = (EditText) findViewById(R.id.EditTextBookMonth); //取得BookMonth的參考
-        String month = BookMonth.getText().toString(); //取得書籍年齡(string)
+        String month = mEditText.getText().toString(); //取得BookMonth的參考
+        //EditText BookMonth = (EditText) findViewById(R.id.EditTextBookMonth); //取得BookMonth的參考
+        //String month = BookMonth.getText().toString(); //取得書籍年齡(string)
 
         EditText BookPrize = (EditText) findViewById(R.id.EditTextBookPrize); //取得BookPrize的參考
         String prize = BookPrize.getText().toString(); //取得原始價格(string)
@@ -563,5 +616,18 @@ public class Data extends AppCompatActivity {
         String kind = String.valueOf(spinner.getSelectedItem()); //取得使用者在spinner選擇的項目
 
         return new Book(name, month, prize, kind);
+    }
+
+    protected void showDatePickDlg() {
+        Calendar calendar = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(Data.this, new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Data.this.mEditText.setText(year + "-" + monthOfYear + "-" + dayOfMonth);
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.show();
+
     }
 }

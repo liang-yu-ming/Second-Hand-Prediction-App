@@ -46,8 +46,10 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Data extends AppCompatActivity {
 
@@ -135,7 +137,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class1");
             buttonCalled = 1;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -146,7 +147,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class2");
             buttonCalled = 2;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -157,7 +157,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class3");
             buttonCalled = 3;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -168,7 +167,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class4");
             buttonCalled = 4;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -179,7 +177,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class5");
             buttonCalled = 5;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -190,7 +187,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class6");
             buttonCalled = 6;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -201,7 +197,6 @@ public class Data extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            System.out.println("class7");
             buttonCalled = 7;
 
             startActivityForResult(intent, READ_REQUEST_CODE);
@@ -242,7 +237,6 @@ public class Data extends AppCompatActivity {
             write_byte(folder, fileName, Sendmsg);
             Bundle bundle = new Bundle();
             bundle.putInt("folderName", filesCount);
-            //System.out.println("filename = " + fileName);
             intent.putExtras(bundle);
 
             write_book_information(book);
@@ -464,7 +458,6 @@ public class Data extends AppCompatActivity {
             if(!folder.exists())
                 folder.mkdir();
             photo_name = folder_name + "/photo" + String.valueOf(count) + ".png";
-            System.out.println("save path = " + photo_name);
             fOut = new FileOutputStream(new File(photo_name));
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
             try {
@@ -489,8 +482,6 @@ public class Data extends AppCompatActivity {
         while (inputStream.read(data) != -1) {
             outputStream.write(data);
         }
-        System.out.println("copy old path = " + oldFilePath);
-        System.out.println("copy new path = " + newFilePath);
         inputStream.close();
         outputStream.close();
     }
@@ -556,15 +547,10 @@ public class Data extends AppCompatActivity {
     public void write_book_information(Book book){
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
         String t = format.format(new Date());
-        String tmp = "_" + book.getBookname();
-        t = t + tmp;
-        tmp = "_" + book.getBookmonth();
-        t = t + tmp;
-        tmp = "_" + book.getBookprize();
-        t = t + tmp;
-        tmp = "_" + book.getBookkind();
-        t = t + tmp;
-        t = t + "\n";
+        t += "_" + book.getBookname();
+        t += "_" + book.getBookmonth();
+        t += "_" + book.getBookprize();
+        t += "_" + book.getBookkind();
 
         File dir = new File(current_folder_name);
         String index = "book_information.txt";
@@ -603,11 +589,9 @@ public class Data extends AppCompatActivity {
 
     private Book getBookInformation(){
         EditText BookName = (EditText) findViewById(R.id.EditTextBookName); //取得BookName的參考
-        String name = BookName.getText().toString(); //取得書籍名稱
+        String name = "\"" + BookName.getText().toString() + "\"";
 
         String month = mEditText.getText().toString(); //取得BookMonth的參考
-        //EditText BookMonth = (EditText) findViewById(R.id.EditTextBookMonth); //取得BookMonth的參考
-        //String month = BookMonth.getText().toString(); //取得書籍年齡(string)
 
         EditText BookPrize = (EditText) findViewById(R.id.EditTextBookPrize); //取得BookPrize的參考
         String prize = BookPrize.getText().toString(); //取得原始價格(string)

@@ -28,6 +28,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +51,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private String bookprize = Data.Book.bookprize;
     private String bookkind = Data.Book.bookkind;
     private int score = 0;
-    private int CTR = 0;
+    private long CTR = 0;
 
     public void send(byte[] msg){
         try {
@@ -96,7 +98,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             Log.d("123", String.valueOf(e));
         }
         send(SendMsg);
-        System.out.println("already send");
         getServerData();
         try{
             socket.close();
@@ -110,7 +111,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
         bundle.putString("result", RecMsg);
         intent.putExtras(bundle);
         reptile();
-        //calculatePrice(bookname, bookmonth, bookprize, bookkind, score);
+        calculatePrice();
 
         startActivity(intent);
     }
@@ -163,7 +164,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
     }
 
     public void getServerData(){
-        System.out.println("in get data");
         int imageCount = 0;
         try {
             byte[] frame =  new byte[1024];
@@ -179,7 +179,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.arraycopy(data, 0, alldatalength_byte, 0,alldatalength_byte.length);
             data = cliparray(data, 4);
             int alldatalength_int = ByteBuffer.wrap(alldatalength_byte).getInt();
-            System.out.println("alldatalength = " + alldatalength_int);
 
             while (data.length < 4){
                 int current_rec = socket.getInputStream().read(frame);
@@ -195,7 +194,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             score = score_int;
             System.out.println("score = " + score_int);
             alldatalength_int -= 4;
-            System.out.println("alldatalength = " + alldatalength_int);
             String scoreStr = "_" + String.valueOf(score_int);
             File scorefile = new File(folderName + "/book_information.txt");
             FileOutputStream outputStream;
@@ -222,7 +220,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 int oneimagelength_int = ByteBuffer.wrap(oneimagelength_byte).getInt();
                 System.out.println("one image length = " + oneimagelength_int);
                 alldatalength_int -= 4;
-                System.out.println("alldatalength = " + alldatalength_int);
                 while (data.length < oneimagelength_int){
                     int current_rec = socket.getInputStream().read(frame);
                     //System.out.println("current_rec = " + current_rec);
@@ -235,10 +232,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 //System.arraycopy(data, oneimage.length, data, 0, data.length - oneimage.length);
                 data = cliparray(data, oneimage.length);
                 alldatalength_int -= oneimagelength_int;
-                System.out.println("qwe alldatalength = " + alldatalength_int);
 
                 File imagefile = new File(folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
-                System.out.println("get path "+ folderName + "/detected" + String.valueOf(imageCount) + ".jpg");
                 FileOutputStream fos = new FileOutputStream(imagefile);
                 fos.write(oneimage, 0, oneimage.length);
                 fos.flush();
@@ -257,26 +252,33 @@ public class TCPClient_Waiting extends AppCompatActivity {
         System.arraycopy(array, x,array1, 0, array1.length);
         return array1;
     }
-/*
-    public void calculatePrice(String bookname, String bookmonth, String bookprize, String bookkind, int score){
-        //bookname丟爬蟲
-        String[] time = bookmonth.split("-");
-        int age =  Integer.valueOf(time[0]);
+    public void calculatePrice(){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        String currentTime = format.format(new Date());
+        String[] currentYear = currentTime.split("/");
+        int currentAge = Integer.valueOf(currentYear[0]);
+        String[] bookYear = bookmonth.split("-");
+        int age =  currentAge - Integer.valueOf(bookYear[0]);
+        System.out.println("age = " + age);
         double depreciation = 1 / score;
         double discount = 0;
         String t = "";
         if(bookkind.equals("文學小說") || bookkind.equals("人文史地")){
-            discount = Math.pow(1.5, 2 + depreciation + age);
+            System.out.println("in 文史");
+            discount = Math.log(Math.log(CTR)) * Math.pow(1.5, 2 + depreciation + age);
         } else {
-            discount = 0.95 * depreciation / age;
+            System.out.println("in other");
+            discount = 0.95 * Math.log(CTR) * depreciation / age;
         }
         discount = Math.round(discount*100.0)/100.0;
+        System.out.println("discount = " + discount);
         if(bookprize.equals("$")){
-            t = String.valueOf(0) + "_" + String.valueOf(discount);
+            t = "_" + String.valueOf(0) + "_" + String.valueOf(discount);
         }
         else {
-            t = bookprize + "_" + String.valueOf(discount);
+            t = "_" + bookprize + "_" + String.valueOf(discount);
         }
+        System.out.println("t = " + t);
         File dir = new File(folderName);
         String index = "book_information.txt";
         write_string(dir, index, t);
@@ -295,11 +297,10 @@ public class TCPClient_Waiting extends AppCompatActivity {
         }
     }
 
- */
     public void reptile(){
         String tmp = "";
         if(isNetworkAvailable(this)){
-            String NetUrl = "https://www.google.com/search?q=" + "哈利波特";
+            String NetUrl = "https://www.google.com/search?q=" + bookname;
             System.out.println("Url = " + NetUrl);
             Connection conn = Jsoup.connect(NetUrl);
             conn.header("User-Agent",
@@ -315,14 +316,16 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.out.println("Network error");
         }
         String[] tmpSplit = tmp.split(" ");
+        System.out.println("tmpSplit = " + tmpSplit[1]);
         NumberFormat format = NumberFormat.getInstance(Locale.US);
         Number number = 0;
         try {
             number = format.parse(tmpSplit[1]);
+            System.out.println("number = " + number);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        CTR = number.intValue();
+        CTR = number.longValue();
         System.out.println("CTR = " + CTR);
     }
 

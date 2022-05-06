@@ -8,7 +8,10 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,8 +34,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TCPClient_Waiting extends AppCompatActivity {
 
@@ -54,6 +55,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private long CTR = 0;
 
     public void send(byte[] msg){
+        System.out.println("SendMsg length = " + msg.length);
         try {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(msg);
@@ -75,6 +77,9 @@ public class TCPClient_Waiting extends AppCompatActivity {
         File folder = new File(folderName);
         byte[] tmp = read_tmp(folder, fileName);
         SendMsg = addBytes(SendMsg, tmp);
+
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         TCPClientThread tcpClientThread = new TCPClientThread();
         Thread t = new Thread(tcpClientThread);
@@ -171,6 +176,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
             byte[] current_data;
             while (data.length < 4){
                 int current_rec = socket.getInputStream().read(frame);
+                System.out.println("current_rec = " + current_rec);
                 current_data = new byte[current_rec];
                 System.arraycopy(frame, 0, current_data, 0,current_rec);
                 data = addBytes(data, current_data);
@@ -179,7 +185,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.arraycopy(data, 0, alldatalength_byte, 0,alldatalength_byte.length);
             data = cliparray(data, 4);
             int alldatalength_int = ByteBuffer.wrap(alldatalength_byte).getInt();
-            System.out.println("ImageMsg length = " + alldatalength_int);
             while (data.length < 4){
                 int current_rec = socket.getInputStream().read(frame);
                 current_data = new byte[current_rec];
@@ -216,14 +221,12 @@ public class TCPClient_Waiting extends AppCompatActivity {
                 System.arraycopy(data, 0, oneimagelength_byte, 0,oneimagelength_byte.length);
                 data = cliparray(data, 4);
                 int oneimagelength_int = ByteBuffer.wrap(oneimagelength_byte).getInt();
-                System.out.println("one image length = " + oneimagelength_int);
                 alldatalength_int -= 4;
                 while (data.length < oneimagelength_int){
                     int current_rec = socket.getInputStream().read(frame);
                     current_data = new byte[current_rec];
                     System.arraycopy(frame, 0, current_data, 0,current_rec);
                     data = addBytes(data, current_data);
-                    System.out.println("length = " + data.length);
                 }
                 byte[] oneimage = new byte[oneimagelength_int];
                 System.arraycopy(data, 0, oneimage, 0,oneimage.length);
@@ -255,27 +258,30 @@ public class TCPClient_Waiting extends AppCompatActivity {
         String[] currentYear = currentTime.split("/");
         int currentAge = Integer.valueOf(currentYear[0]);
         String[] bookYear = bookmonth.split("-");
-        int age =  currentAge - Integer.valueOf(bookYear[0]);
+        int age =  currentAge - Integer.valueOf(bookYear[0]); // 取得年齡
         System.out.println("age = " + age);
-        double depreciation = 1 / score;
-        double discount = 0;
+        double discount = 0; // 宣告折舊比例
         String t = "";
+        double item1 = (double)CTR / (CTR + 50000.0);
+        double item2 = Math.pow(2.71, -Math.pow(score / 3500.0, 2.0));
         if(bookkind.equals("文學小說") || bookkind.equals("人文史地")){
             System.out.println("in 文史");
-            discount = Math.log(Math.log(CTR)) * Math.pow(1.5, 2 + depreciation + age);
+            double item3 = 30.0 / (Math.log(age + 1.0) + 30.0);
+            discount = item1 * item2 * item3;
         } else {
             System.out.println("in other");
-            discount = 0.95 * Math.log(CTR) * depreciation / age;
+            double item3 = 1.0 / (Math.pow(1.8, age - 8) + 1.0);
+            discount = item1 * item2 * item3;
         }
+        System.out.println("1 discount = " + discount);
         discount = (float)Math.round(discount*100.0)/100.0;
-        System.out.println("discount = " + discount);
+        System.out.println("2 discount = " + discount);
         if(bookprize.equals("$")){
             t = "_" + String.valueOf(0) + "_" + String.valueOf(discount);
         }
         else {
             t = "_" + bookprize + "_" + String.valueOf(discount);
         }
-        System.out.println("t = " + t);
         File dir = new File(folderName);
         String index = "book_information.txt";
         write_string(dir, index, t);
@@ -313,12 +319,10 @@ public class TCPClient_Waiting extends AppCompatActivity {
             System.out.println("Network error");
         }
         String[] tmpSplit = tmp.split(" ");
-        System.out.println("tmpSplit = " + tmpSplit[1]);
         NumberFormat format = NumberFormat.getInstance(Locale.US);
         Number number = 0;
         try {
             number = format.parse(tmpSplit[1]);
-            System.out.println("number = " + number);
         } catch (ParseException e) {
             e.printStackTrace();
         }

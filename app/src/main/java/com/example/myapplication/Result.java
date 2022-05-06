@@ -5,25 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Result extends AppCompatActivity {
 
@@ -44,18 +37,30 @@ public class Result extends AppCompatActivity {
         String[] bookInforSplit = bookInfor.split("_");
         String bookName = bookInforSplit[1];
         bookName = bookName.replace("\"", "");
-        String score = bookInforSplit[5];
+        String scoreStr = bookInforSplit[5];
+        int scoreInt = Integer.valueOf(scoreStr);
         String originalPriceStr = bookInforSplit[6];
         originalPriceStr = originalPriceStr.replace("$","");
         String discountStr = bookInforSplit[7];
         int originalPriceInt = Integer.valueOf(originalPriceStr);
-        double discountInt = Double.valueOf(discountStr);
+        double discountInt = Double.valueOf(discountStr) * 100;
+        discountStr = String.valueOf((int)discountInt) + "%";
+        if(scoreInt >= 0 && scoreInt < 1000)
+            scoreStr += "  " + "(A 級:書況優良)";
+        else if(scoreInt >= 1000 && scoreInt < 2000)
+            scoreStr += "  " +  "(B 級:書況良好)";
+        else if(scoreInt >= 2000 && scoreInt < 3000)
+            scoreStr += "  " +  "(C 級:書況正常)";
+        else if(scoreInt >= 3000 && scoreInt < 4000)
+            scoreStr += "  " +  "(D 級:書況不佳)";
+        else if(scoreInt >= 4000 && scoreInt < 5000)
+            scoreStr += "  " +  "(E 級:書況極遭)";
 
         TextView bookNameText = (TextView) findViewById(R.id.Title);
         bookNameText.setText(bookName);
 
         TextView scoreText = (TextView) findViewById(R.id.Grade);
-        scoreText.setText(score);
+        scoreText.setText(scoreStr);
 
         TextView discountText = (TextView) findViewById(R.id.Propotion);
         discountText.setText(discountStr);
@@ -64,7 +69,7 @@ public class Result extends AppCompatActivity {
         if(originalPriceInt == 0){
             predictPriceText.setText("未輸入原始價格");
         }else {
-            String predictPriceStr = String.valueOf(originalPriceInt * discountInt);
+            String predictPriceStr = String.valueOf((int)Math.ceil(originalPriceInt * discountInt / 100));
             predictPriceText.setText(predictPriceStr);
         }
 

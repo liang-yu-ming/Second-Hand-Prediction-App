@@ -12,8 +12,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,13 +25,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,15 +36,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class Data extends AppCompatActivity {
 
@@ -132,75 +123,13 @@ public class Data extends AppCompatActivity {
             }
         });
 
-        ButtonPageClass1.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 1;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass2.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 2;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass3.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 3;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass4.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 4;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass5.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 5;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass6.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 6;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
-
-        ButtonPageClass7.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            buttonCalled = 7;
-
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        });
+        ButtonPageClass1.setOnClickListener(v -> { toMediaCabinet(1); });
+        ButtonPageClass2.setOnClickListener(v -> { toMediaCabinet(2); });
+        ButtonPageClass3.setOnClickListener(v -> { toMediaCabinet(3); });
+        ButtonPageClass4.setOnClickListener(v -> { toMediaCabinet(4); });
+        ButtonPageClass5.setOnClickListener(v -> { toMediaCabinet(5); });
+        ButtonPageClass6.setOnClickListener(v -> { toMediaCabinet(6); });
+        ButtonPageClass7.setOnClickListener(v -> { toMediaCabinet(7); });
 
         EditText test = (EditText)findViewById(R.id.EditTextBookName);
         to_tcpclientwaiting_page.setOnClickListener(v -> {
@@ -277,6 +206,72 @@ public class Data extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
+        switch (buttonCalled){
+            case 1:
+                if ( resultData.getData() != null){
+                    Toast.makeText(this,"請選擇 6 張內頁!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(1);
+                }
+                else if( resultData.getClipData().getItemCount() != 6){
+                    Toast.makeText(this,"請選擇 6 張內頁!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(1);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 2:
+                if( resultData.getData() == null){
+                    Toast.makeText(this,"請選擇 1 張書頁側面!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(2);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 3:
+                if ( resultData.getData() != null){
+                    Toast.makeText(this,"請選擇 2 張書背接縫處!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(3);
+                }
+                else if( resultData.getClipData().getItemCount() != 2){
+                    Toast.makeText(this,"請選擇 2 張書背接縫處!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(3);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 4:
+                if( resultData.getData() == null){
+                    Toast.makeText(this,"請選擇 1 張封面!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(4);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 5:
+                if( resultData.getData() == null){
+                    Toast.makeText(this,"請選擇 1 張書衣!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(5);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 6:
+                if( resultData.getData() == null){
+                    Toast.makeText(this,"請選擇 1 張封底!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(6);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+            case 7:
+                if ( resultData.getData() != null){
+                    Toast.makeText(this,"請選擇 2 張折口!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(7);
+                }
+                else if( resultData.getClipData().getItemCount() != 2){
+                    Toast.makeText(this,"請選擇 2 張折口!",Toast.LENGTH_LONG).show();
+                    toMediaCabinet(7);
+                }else {
+                    processPhoto(requestCode, resultCode, resultData);
+                }   break;
+        }
+    }
+
+    private void processPhoto(int requestCode, int resultCode, Intent resultData){
         if (requestCode == READ_REQUEST_CODE && resultCode == RESULT_OK) {
             if (resultData.getData()!=null) {
                 Uri selectedImage = resultData.getData();
@@ -288,7 +283,9 @@ public class Data extends AppCompatActivity {
                 try{
                     FileInputStream input = new FileInputStream(file.getAbsolutePath());
                     byte[] oneimagedata = new byte[(int)file.length()];//宣告imagedata來存放圖片的內容
+                    System.out.println("oneimagedata = " + file.length());
                     byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
+                    System.out.println("oneImageLength size = " + oneImageLength.length);
                     input.read(oneimagedata);//將圖片內容放進oneimagedata
                     Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
                     Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
@@ -308,7 +305,9 @@ public class Data extends AppCompatActivity {
                         try {
                             FileInputStream input = new FileInputStream(file.getAbsolutePath());//取得圖片流
                             byte[] oneimagedata = new byte[(int)file.length()];//宣告一個byte array用來存放一張圖片
+                            System.out.println("oneimagedata = " + file.length());
                             byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
+                            System.out.println("oneImageLength size = " + oneImageLength.length);
                             input.read(oneimagedata);//將圖片內容放進oneimagedata
                             Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
                             Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
@@ -321,34 +320,51 @@ public class Data extends AppCompatActivity {
             switch (buttonCalled){
                 case 1:
                     ButtonPageClass1.setText("Already!");
-                    ButtonPageClass2.setEnabled(true);
-                    break;
+                    ButtonPageClass2.setEnabled(true);  break;
                 case 2:
                     ButtonPageClass2.setText("Already!");
-                    ButtonPageClass3.setEnabled(true);
-                    break;
+                    ButtonPageClass3.setEnabled(true);  break;
                 case 3:
                     ButtonPageClass3.setText("Already!");
-                    ButtonPageClass4.setEnabled(true);
-                    break;
+                    ButtonPageClass4.setEnabled(true);  break;
                 case 4:
                     ButtonPageClass4.setText("Already!");
-                    ButtonPageClass5.setEnabled(true);
-                    break;
+                    ButtonPageClass5.setEnabled(true);  break;
                 case 5:
                     ButtonPageClass5.setText("Already!");
-                    ButtonPageClass6.setEnabled(true);
-                    break;
+                    ButtonPageClass6.setEnabled(true);  break;
                 case 6:
                     ButtonPageClass6.setText("Already!");
-                    ButtonPageClass7.setEnabled(true);
-                    break;
+                    ButtonPageClass7.setEnabled(true);  break;
                 case 7:
                     ButtonPageClass7.setText("Already!");
-                    to_tcpclientwaiting_page.setEnabled(true);
-                    break;
+                    to_tcpclientwaiting_page.setEnabled(true);  break;
             }
         }
+    }
+
+    private void toMediaCabinet(int whoCall){
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        switch (whoCall){
+            case 1:
+                buttonCalled = 1;   break;
+            case 2:
+                buttonCalled = 2;   break;
+            case 3:
+                buttonCalled = 3;   break;
+            case 4:
+                buttonCalled = 4;   break;
+            case 5:
+                buttonCalled = 5;   break;
+            case 6:
+                buttonCalled = 6;   break;
+            case 7:
+                buttonCalled = 7;   break;
+        }
+        startActivityForResult(intent, READ_REQUEST_CODE);
     }
 
     @TargetApi(19)

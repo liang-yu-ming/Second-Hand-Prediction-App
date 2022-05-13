@@ -45,7 +45,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
     private String folderName = "";
     private byte[] SendMsg = new byte[0];
     private String RecMsg = "";
-    private final String serverip = "192.168.0.122";
+    private final String serverip = "120.126.151.184";
     private final int serverport = 5422;
     private String bookname = Data.Book.bookname;
     private String bookmonth = Data.Book.bookmonth;
@@ -253,16 +253,18 @@ public class TCPClient_Waiting extends AppCompatActivity {
         return array1;
     }
     public void calculatePrice(){
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-        String currentTime = format.format(new Date());
-        String[] currentYear = currentTime.split("/");
-        int currentAge = Integer.valueOf(currentYear[0]);
-        String[] bookYear = bookmonth.split("-");
-        int age =  currentAge - Integer.valueOf(bookYear[0]); // 取得年齡
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss"); // 取得目前的時間
+        String currentTimeStr = format.format(new Date()); // 轉成 String
+        String[] tmpSplit = currentTimeStr.split("-");
+        String[] currentTimeSplit = tmpSplit[0].split("/"); // 將 String 分割
+        int currentTimeInt = Integer.valueOf(currentTimeSplit[0]) * 365 + Integer.valueOf(currentTimeSplit[1]) * 30 + Integer.valueOf(currentTimeSplit[2]);
+        String[] bookTimeSplit = bookmonth.split("-"); // 取得書本的時間
+        int bookTimeInt = Integer.valueOf(bookTimeSplit[0]) * 365 + Integer.valueOf(bookTimeSplit[1]) * 30 + Integer.valueOf(bookTimeSplit[2]);
+        int age =  currentTimeInt - bookTimeInt; // 取得年齡
         System.out.println("age = " + age);
         double discount = 0; // 宣告折舊比例
         String t = "";
-        double item1 = (double)CTR / (CTR + 50000.0);
+        double item1 = (double)CTR / ((double)CTR + 50000.0);
         double item2 = Math.pow(2.71, -Math.pow(score / 3500.0, 2.0));
         if(bookkind.equals("文學小說") || bookkind.equals("人文史地")){
             System.out.println("in 文史");
@@ -270,13 +272,13 @@ public class TCPClient_Waiting extends AppCompatActivity {
             discount = item1 * item2 * item3;
         } else {
             System.out.println("in other");
-            double item3 = 1.0 / (Math.pow(1.8, age - 8) + 1.0);
+            double item3 = (4.0 / 5.0 * 1.0 / (Math.pow(1.8, age - 8) + 1.0)) + (1.0 / 5.0 * 50.0 / (age + 50.0));
             discount = item1 * item2 * item3;
         }
         System.out.println("1 discount = " + discount);
         discount = (float)Math.round(discount*100.0)/100.0;
         System.out.println("2 discount = " + discount);
-        if(bookprize.equals("$")){
+        if(bookprize.equals("")){
             t = "_" + String.valueOf(0) + "_" + String.valueOf(discount);
         }
         else {

@@ -21,7 +21,7 @@ import java.io.IOException;
 public class Result extends AppCompatActivity {
 
     private String folderPath = "";
-    private int i=0;
+    private int imageCount=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +59,27 @@ public class Result extends AppCompatActivity {
         TextView bookNameText = (TextView) findViewById(R.id.Title);
         bookNameText.setText(bookName);
 
-        TextView scoreText = (TextView) findViewById(R.id.Grade);
+        TextView scoreText = (TextView) findViewById(R.id.GradeText);
         scoreText.setText(scoreStr);
 
-        TextView discountText = (TextView) findViewById(R.id.Propotion);
+        TextView discountText = (TextView) findViewById(R.id.discountText);
         discountText.setText(discountStr);
 
-        TextView predictPriceText = (TextView) findViewById(R.id.Price);
+        TextView bookclassText = (TextView) findViewById(R.id.bookclassText);
+        bookclassText.setText(bookInforSplit[4]);
+
+        TextView predictPriceText = (TextView) findViewById(R.id.priceText);
         if(originalPriceInt == 0){
-            predictPriceText.setText("未輸入原始價格");
+            TextView predictPriceTitle = (TextView) findViewById(R.id.priceTitle);
+            predictPriceTitle.setText("未輸入價格");
+            predictPriceText.setText("");
         }else {
             String predictPriceStr = String.valueOf((int)Math.ceil(originalPriceInt * discountInt / 100));
             predictPriceText.setText(predictPriceStr);
         }
+
+        TextView ageText = (TextView) findViewById(R.id.ageText);
+        ageText.setText(bookInforSplit[2]);
 
         Button to_main_page = (Button) findViewById(R.id.button4);
         to_main_page.setOnClickListener(new View.OnClickListener() {
@@ -94,76 +102,41 @@ public class Result extends AppCompatActivity {
             }
         });
 
+        TextView page = (TextView) findViewById(R.id.page);
         ImageView tv = (ImageView)findViewById(R.id.imageView);
-        Button next_image = (Button) findViewById(R.id.button2);
-        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(0) + ".png");
-        BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
+        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount) + ".png");
+        BitmapDrawable bmpDraw = new BitmapDrawable(bmp);
         tv.setImageDrawable(bmpDraw);
-        i++ ;
+        String currentPage = String.valueOf(imageCount + 1) + "/14";
+        page.setText(currentPage);
 
+        Button next_image = (Button) findViewById(R.id.next);
         next_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (i) {
-                    case 0:
-                        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
-                        tv.setImageDrawable(bmpDraw); i++ ;break;
-                    case 1:
-                        Bitmap bmp1 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw1=new BitmapDrawable(bmp1);
-                        tv.setImageDrawable(bmpDraw1); i++ ;break;
-                    case 2:
-                        Bitmap bmp2 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw2=new BitmapDrawable(bmp2);
-                        tv.setImageDrawable(bmpDraw2); i++ ;break;
-                    case 3:
-                        Bitmap bmp3 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw3=new BitmapDrawable(bmp3);
-                        tv.setImageDrawable(bmpDraw3); i++ ;break;
-                    case 4:
-                        Bitmap bmp4 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw4=new BitmapDrawable(bmp4);
-                        tv.setImageDrawable(bmpDraw4); i++ ;break;
-                    case 5:
-                        Bitmap bmp5 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw5=new BitmapDrawable(bmp5);
-                        tv.setImageDrawable(bmpDraw5); i++ ;break;
-                    case 6:
-                        Bitmap bmp6 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw6=new BitmapDrawable(bmp6);
-                        tv.setImageDrawable(bmpDraw6); i++ ;break;
-                    case 7:
-                        Bitmap bmp7 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw7=new BitmapDrawable(bmp7);
-                        tv.setImageDrawable(bmpDraw7); i++ ;break;
-                    case 8:
-                        Bitmap bmp8 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw8=new BitmapDrawable(bmp8);
-                        tv.setImageDrawable(bmpDraw8); i++ ;break;
-                    case 9:
-                        Bitmap bmp9 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw9=new BitmapDrawable(bmp9);
-                        tv.setImageDrawable(bmpDraw9); i++ ;break;
-                    case 10:
-                        Bitmap bmp10 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw10=new BitmapDrawable(bmp10);
-                        tv.setImageDrawable(bmpDraw10); i++ ;break;
-                    case 11:
-                        Bitmap bmp11 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw11=new BitmapDrawable(bmp11);
-                        tv.setImageDrawable(bmpDraw11); i++ ;break;
-                    case 12:
-                        Bitmap bmp12 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw12=new BitmapDrawable(bmp12);
-                        tv.setImageDrawable(bmpDraw12); i++ ;break;
-                    case 13:
-                        Bitmap bmp13 = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(i) + ".png");
-                        BitmapDrawable bmpDraw13=new BitmapDrawable(bmp13);
-                        tv.setImageDrawable(bmpDraw13); i++ ;break;
-                }
-                if(i >= 14)
-                    i = 0;
+                imageCount++ ;
+                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount % 14) + ".png");
+                BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
+                tv.setImageDrawable(bmpDraw);
+                if (imageCount >= 14)
+                    imageCount = imageCount % 14;
+                String currentPage = String.valueOf(imageCount + 1) + "/14";
+                page.setText(currentPage);
+            }
+        });
+
+        Button previous_image = (Button) findViewById(R.id.previous);
+        previous_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageCount-- ;
+                if (imageCount < 0)
+                    imageCount = 13;
+                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount % 14) + ".png");
+                BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
+                tv.setImageDrawable(bmpDraw);
+                String currentPage = String.valueOf(imageCount + 1) + "/14";
+                page.setText(currentPage);
             }
         });
     }

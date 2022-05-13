@@ -8,13 +8,14 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/b"/>
+        app:srcCompat="@drawable/b"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,8 +25,8 @@
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="@dimen/dp_100"
             app:srcCompat="@drawable/search" />
 
         <TextView
@@ -33,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="書籍書級評鑑大師"
-            android:textSize="30dp" />
+            android:textSize="@dimen/sp_30" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

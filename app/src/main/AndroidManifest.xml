@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,9 +25,6 @@
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".TCPClient_Waiting"
-            android:exported="false" />
-        <activity
-            android:name=".Choose_pic"
             android:exported="false" />
         <activity
             android:name=".Result_second"

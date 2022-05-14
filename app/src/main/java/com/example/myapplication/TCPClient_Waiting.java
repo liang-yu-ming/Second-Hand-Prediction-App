@@ -260,7 +260,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
         int currentTimeInt = Integer.valueOf(currentTimeSplit[0]) * 365 + Integer.valueOf(currentTimeSplit[1]) * 30 + Integer.valueOf(currentTimeSplit[2]);
         String[] bookTimeSplit = bookmonth.split("-"); // 取得書本的時間
         int bookTimeInt = Integer.valueOf(bookTimeSplit[0]) * 365 + Integer.valueOf(bookTimeSplit[1]) * 30 + Integer.valueOf(bookTimeSplit[2]);
-        int age =  currentTimeInt - bookTimeInt; // 取得年齡
+        double age =  currentTimeInt - bookTimeInt;
+        age = age / 365.0;// 取得年齡
         System.out.println("age = " + age);
         double discount = 0; // 宣告折舊比例
         String t = "";
@@ -272,7 +273,7 @@ public class TCPClient_Waiting extends AppCompatActivity {
             discount = item1 * item2 * item3;
         } else {
             System.out.println("in other");
-            double item3 = (4.0 / 5.0 * 1.0 / (Math.pow(1.8, age - 8) + 1.0)) + (1.0 / 5.0 * 50.0 / (age + 50.0));
+            double item3 = ((4.0 / 5.0) * (1.0 / (Math.pow(1.8, age - 8) + 1.0))) + (1.0 / 5.0 * 50.0 / (age + 50.0));
             discount = item1 * item2 * item3;
         }
         System.out.println("1 discount = " + discount);

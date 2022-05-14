@@ -43,7 +43,7 @@ public class Result_second extends AppCompatActivity {
 
         TextView page = (TextView) findViewById(R.id.page);
         ImageView tv = (ImageView)findViewById(R.id.imageView);
-        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount) + ".png");
+        Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/detected" + String.valueOf(imageCount) + ".jpg");
         BitmapDrawable bmpDraw = new BitmapDrawable(bmp);
         tv.setImageDrawable(bmpDraw);
         String currentPage = String.valueOf(imageCount + 1) + "/6";
@@ -54,7 +54,7 @@ public class Result_second extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 imageCount++ ;
-                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount % 6) + ".png");
+                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/detected" + String.valueOf(imageCount % 6) + ".jpg");
                 BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
                 tv.setImageDrawable(bmpDraw);
                 if (imageCount >= 6)
@@ -71,7 +71,7 @@ public class Result_second extends AppCompatActivity {
                 imageCount-- ;
                 if (imageCount < 0)
                     imageCount = 5;
-                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount % 6) + ".png");
+                Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/detected" + String.valueOf(imageCount % 6) + ".jpg");
                 BitmapDrawable bmpDraw=new BitmapDrawable(bmp);
                 tv.setImageDrawable(bmpDraw);
                 String currentPage = String.valueOf(imageCount + 1) + "/6";

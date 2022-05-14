@@ -1,14 +1,11 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">書籍書級評鑑大師</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">書籍書籍</string>
+    <string name="first_fragment_label">歷史預測紀錄</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">back to result</string>
-
-    <string name="hello_first_fragment">歷史預測紀錄</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
     <string-array name="spinner_of_data">
         <item>文學小說</item>

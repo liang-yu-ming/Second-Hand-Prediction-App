@@ -16,7 +16,7 @@
             android:id="@+id/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_30"
+            android:layout_marginTop="@dimen/dp_20"
             android:gravity="center"
             android:text="照片問題點"
             android:textSize="@dimen/sp_40" />
@@ -42,7 +42,8 @@
                 android:layout_weight="1"
                 android:layout_width="@dimen/dp_0"
                 android:layout_height="wrap_content"
-                android:text="prev" />
+                android:text="prev"
+                android:textSize="@dimen/sp_10"  />
 
             <TextView
                 android:id="@+id/page"
@@ -59,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_10"
                 android:text="next"
-                android:textSize="@dimen/sp_13" />
+                android:textSize="@dimen/sp_10" />
 
         </LinearLayout>
 
@@ -68,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/previous"
-            android:textSize="@dimen/sp_13"
+            android:textSize="@dimen/sp_10"
             android:layout_marginTop="@dimen/dp_20"/>
     </LinearLayout>
 

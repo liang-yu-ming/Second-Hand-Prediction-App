@@ -54,6 +54,7 @@ public class FirstFragment extends Fragment {
             String file_name = "book_information.txt";
             String str = read_tmp(file, file_name);
             String[] title = str.split("_");
+            title[1] = title[1].substring(1, title[1].length() - 1);
             Button btn = new Button(getActivity());
             btn.setText(title[0] + " " + title[1]);
             btn.setOnClickListener(new View.OnClickListener() {

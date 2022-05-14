@@ -75,7 +75,7 @@ public class Result extends AppCompatActivity {
             predictPriceText.setText("");
         }else {
             String predictPriceStr = String.valueOf((int)Math.ceil(originalPriceInt * discountInt / 100));
-            predictPriceText.setText(predictPriceStr);
+            predictPriceText.setText("TWD " + predictPriceStr);
         }
 
         TextView ageText = (TextView) findViewById(R.id.ageText);

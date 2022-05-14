@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="書籍名稱:"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
 
             <EditText
                 android:id="@+id/EditTextBookName"
@@ -46,7 +46,7 @@
                 android:layout_marginLeft="@dimen/dp_20"
                 android:hint="e.g. Harry potter"
                 android:inputType="textPersonName"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="書籍年齡:"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
 
             <EditText
                 android:id="@+id/EditTextBookMonth"
@@ -72,7 +72,7 @@
                 android:layout_marginLeft="@dimen/dp_20"
                 android:hint="e.g. 2021-5-6"
                 android:inputType="textPersonName"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
         </LinearLayout>
 
         <LinearLayout
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="書籍類別:"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
 
             <Spinner
                 android:id="@+id/SpinnerBookClass"
@@ -110,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="選擇照片:"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -128,7 +128,7 @@
                         android:layout_width="@dimen/dp_100"
                         android:layout_height="@dimen/dp_40"
                         android:text="內頁*6"
-                        android:textSize="@dimen/sp_13" />
+                        android:textSize="@dimen/sp_10" />
 
                     <Button
                         android:id="@+id/ButtonPageClass2"
@@ -158,7 +158,7 @@
                         android:layout_height="@dimen/dp_40"
                         android:layout_marginLeft="@dimen/dp_10"
                         android:text="封面*1"
-                        android:textSize="@dimen/sp_13" />
+                        android:textSize="@dimen/sp_10" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -172,7 +172,7 @@
                         android:layout_width="@dimen/dp_100"
                         android:layout_height="@dimen/dp_40"
                         android:text="書衣*1"
-                        android:textSize="@dimen/sp_13" />
+                        android:textSize="@dimen/sp_10" />
 
                     <Button
                         android:id="@+id/ButtonPageClass6"
@@ -180,7 +180,7 @@
                         android:layout_height="@dimen/dp_40"
                         android:layout_marginLeft="@dimen/dp_10"
                         android:text="封底*1"
-                        android:textSize="@dimen/sp_13" />
+                        android:textSize="@dimen/sp_10" />
                 </LinearLayout>
 
                 <Button
@@ -190,7 +190,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/dp_10"
                     android:text="折口*2"
-                    android:textSize="@dimen/sp_13" />
+                    android:textSize="@dimen/sp_10" />
 
             </LinearLayout>
         </LinearLayout>
@@ -207,7 +207,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="原始價格:(選填)"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_15" />
 
             <EditText
                 android:id="@+id/EditTextBookPrize"
@@ -217,7 +217,7 @@
                 android:ems="8"
                 android:inputType="textPersonName"
                 android:hint="e.g.100"
-                android:textSize="20dp" />
+                android:textSize="@dimen/sp_15" />
         </LinearLayout>
 
         <Button
@@ -227,7 +227,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/dp_40"
             android:text="send"
-            android:textSize="@dimen/sp_18"/>
+            android:textSize="@dimen/sp_10"/>
 
     </LinearLayout>
 

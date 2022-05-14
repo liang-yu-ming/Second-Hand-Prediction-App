@@ -152,10 +152,15 @@ public class Data extends AppCompatActivity {
             String folder_tmp_name = dir.getPath() + "/tmp";
             File folder_tmp = new File(folder_tmp_name);
             File[] photo_files = folder_tmp.listFiles();
-            for (int i = 0; i < photo_files.length; i++){
-                String new_path = folder_name + "/photo" + String.valueOf(i) + ".png";
+            for(File file : photo_files){
+                System.out.println("old : " + file.getPath());
+                String oldPath = file.getPath();
+                String[] oldPathCount = oldPath.split("/");
+                oldPathCount[oldPathCount.length - 1] = oldPathCount[oldPathCount.length - 1].substring(5, oldPathCount[oldPathCount.length - 1].indexOf("."));
+                String new_path = folder_name + "/photo" + oldPathCount[oldPathCount.length - 1] + ".png";
+                System.out.println("new : " + new_path);
                 try {
-                    fileCopy(photo_files[i].getPath(), new_path);
+                    fileCopy(oldPath, new_path);
                 }catch (IOException e){
                     e.printStackTrace();
                 }
@@ -320,24 +325,31 @@ public class Data extends AppCompatActivity {
             switch (buttonCalled){
                 case 1:
                     ButtonPageClass1.setText("Already!");
+                    ButtonPageClass1.setEnabled(false);
                     ButtonPageClass2.setEnabled(true);  break;
                 case 2:
                     ButtonPageClass2.setText("Already!");
+                    ButtonPageClass2.setEnabled(false);
                     ButtonPageClass3.setEnabled(true);  break;
                 case 3:
                     ButtonPageClass3.setText("Already!");
+                    ButtonPageClass3.setEnabled(false);
                     ButtonPageClass4.setEnabled(true);  break;
                 case 4:
                     ButtonPageClass4.setText("Already!");
+                    ButtonPageClass4.setEnabled(false);
                     ButtonPageClass5.setEnabled(true);  break;
                 case 5:
                     ButtonPageClass5.setText("Already!");
+                    ButtonPageClass5.setEnabled(false);
                     ButtonPageClass6.setEnabled(true);  break;
                 case 6:
                     ButtonPageClass6.setText("Already!");
+                    ButtonPageClass6.setEnabled(false);
                     ButtonPageClass7.setEnabled(true);  break;
                 case 7:
                     ButtonPageClass7.setText("Already!");
+                    ButtonPageClass7.setEnabled(false);
                     to_tcpclientwaiting_page.setEnabled(true);  break;
             }
         }
@@ -627,6 +639,5 @@ public class Data extends AppCompatActivity {
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
-
     }
 }

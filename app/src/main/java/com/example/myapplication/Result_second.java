@@ -17,10 +17,15 @@ import android.graphics.BitmapFactory;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Result_second extends AppCompatActivity {
     int imageCount=0;
+    private int[] pageContent = new int[6];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +46,14 @@ public class Result_second extends AppCompatActivity {
             }
         });
 
+        String bookInfor = readFromFile(folderPath, "book_information.txt");
+        String[] bookInforSplit = bookInfor.split("_");
+        String bookPageContentStr = bookInforSplit[5];
+        String[] bookPageContentSplit = bookPageContentStr.split(",");
+        for(int i = 0; i < 6; i++)
+            pageContent[i] = Integer.valueOf(bookPageContentSplit[i]);
+
+        TextView originPage = (TextView) findViewById(R.id.originPage);
         TextView page = (TextView) findViewById(R.id.page);
         ImageView tv = (ImageView)findViewById(R.id.imageView);
         Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/detected" + String.valueOf(imageCount) + ".jpg");
@@ -48,6 +61,7 @@ public class Result_second extends AppCompatActivity {
         tv.setImageDrawable(bmpDraw);
         String currentPage = String.valueOf(imageCount + 1) + "/6";
         page.setText(currentPage);
+        originPage.setText("第" + pageContent[imageCount] + "頁");
 
         Button next_image = (Button) findViewById(R.id.next);
         next_image.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +75,8 @@ public class Result_second extends AppCompatActivity {
                     imageCount = imageCount % 6;
                 String currentPage = String.valueOf(imageCount + 1) + "/6";
                 page.setText(currentPage);
+                if(imageCount >= 0 && imageCount < 6)
+                    originPage.setText("第" + pageContent[imageCount] + "頁");
             }
         });
 
@@ -76,8 +92,32 @@ public class Result_second extends AppCompatActivity {
                 tv.setImageDrawable(bmpDraw);
                 String currentPage = String.valueOf(imageCount + 1) + "/6";
                 page.setText(currentPage);
+                if(imageCount >= 0 && imageCount < 6)
+                    originPage.setText("第" + pageContent[imageCount] + "頁");
             }
         });
+    }
+
+    private String readFromFile(String folderName, String fileName){
+        String path = folderName + "/" + fileName;
+        String fileAsString = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line = br.readLine();
+            StringBuilder sb = new StringBuilder();
+
+            while (line != null) {
+                sb.append(line).append("\n");
+                line = br.readLine();
+            }
+
+            fileAsString = sb.toString();
+            System.out.println(fileAsString);
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return fileAsString;
     }
 
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,7 @@ public class Result extends AppCompatActivity {
 
     private String folderPath = "";
     private int imageCount=0;
+    private int[] pageContent = new int[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,30 +32,33 @@ public class Result extends AppCompatActivity {
 
         Bundle bundle = this.getIntent().getExtras();
         String fromActivity = bundle.getString("from");
-        System.out.println("fromActivity = " + fromActivity);
         folderPath = bundle.getString("folder_path");
 
         String bookInfor = readFromFile(folderPath, "book_information.txt");
         String[] bookInforSplit = bookInfor.split("_");
         String bookName = bookInforSplit[1];
         bookName = bookName.replace("\"", "");
-        String scoreStr = bookInforSplit[5];
+        String bookPageContentStr = bookInforSplit[5];
+        String[] bookPageContentSplit = bookPageContentStr.split(",");
+        for(int i = 0; i < 6; i++)
+            pageContent[i] = Integer.valueOf(bookPageContentSplit[i]);
+        String scoreStr = bookInforSplit[6];
         int scoreInt = Integer.valueOf(scoreStr);
-        String originalPriceStr = bookInforSplit[6];
+        String originalPriceStr = bookInforSplit[7];
         originalPriceStr = originalPriceStr.replace("$","");
-        String discountStr = bookInforSplit[7];
+        String discountStr = bookInforSplit[8];
         int originalPriceInt = Integer.valueOf(originalPriceStr);
         double discountInt = Double.valueOf(discountStr) * 100;
         discountStr = String.valueOf((int)discountInt) + "%";
-        if(scoreInt >= 0 && scoreInt < 1000)
+        if(scoreInt == 0)
             scoreStr += "  " + "(A 級:書況優良)";
-        else if(scoreInt >= 1000 && scoreInt < 2000)
+        else if(scoreInt < 50)
             scoreStr += "  " +  "(B 級:書況良好)";
-        else if(scoreInt >= 2000 && scoreInt < 3000)
+        else if(scoreInt < 100)
             scoreStr += "  " +  "(C 級:書況正常)";
-        else if(scoreInt >= 3000 && scoreInt < 4000)
+        else if(scoreInt < 150)
             scoreStr += "  " +  "(D 級:書況不佳)";
-        else if(scoreInt >= 4000 && scoreInt < 5000)
+        else
             scoreStr += "  " +  "(E 級:書況極遭)";
 
         TextView bookNameText = (TextView) findViewById(R.id.Title);
@@ -102,6 +107,7 @@ public class Result extends AppCompatActivity {
             }
         });
 
+        TextView originPage = (TextView) findViewById(R.id.originPage);
         TextView page = (TextView) findViewById(R.id.page);
         ImageView tv = (ImageView)findViewById(R.id.imageView);
         Bitmap bmp = BitmapFactory.decodeFile(folderPath + "/photo" + String.valueOf(imageCount) + ".png");
@@ -109,6 +115,7 @@ public class Result extends AppCompatActivity {
         tv.setImageDrawable(bmpDraw);
         String currentPage = String.valueOf(imageCount + 1) + "/14";
         page.setText(currentPage);
+        originPage.setText("第" + pageContent[imageCount] + "頁");
 
         Button next_image = (Button) findViewById(R.id.next);
         next_image.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +129,20 @@ public class Result extends AppCompatActivity {
                     imageCount = imageCount % 14;
                 String currentPage = String.valueOf(imageCount + 1) + "/14";
                 page.setText(currentPage);
+                if(imageCount >= 0 && imageCount < 6)
+                    originPage.setText("第" + pageContent[imageCount] + "頁");
+                else if(imageCount == 6)
+                    originPage.setText("書頁側面");
+                else if(imageCount == 7 || imageCount ==8)
+                    originPage.setText("書頁接縫");
+                else if(imageCount == 9)
+                    originPage.setText("封面");
+                else if(imageCount == 10)
+                    originPage.setText("書背");
+                else if(imageCount == 11)
+                    originPage.setText("封底");
+                else if(imageCount == 12 || imageCount == 13)
+                    originPage.setText("折口");
             }
         });
 
@@ -137,6 +158,21 @@ public class Result extends AppCompatActivity {
                 tv.setImageDrawable(bmpDraw);
                 String currentPage = String.valueOf(imageCount + 1) + "/14";
                 page.setText(currentPage);
+                System.out.println("imageCount = " + imageCount);
+                if(imageCount >= 0 && imageCount < 6)
+                    originPage.setText("第" + pageContent[imageCount] + "頁");
+                else if(imageCount == 6)
+                    originPage.setText("書頁側面");
+                else if(imageCount == 7 || imageCount ==8)
+                    originPage.setText("書頁接縫");
+                else if(imageCount == 9)
+                    originPage.setText("封面");
+                else if(imageCount == 10)
+                    originPage.setText("書背");
+                else if(imageCount == 11)
+                    originPage.setText("封底");
+                else if(imageCount == 12 || imageCount == 13)
+                    originPage.setText("折口");
             }
         });
     }

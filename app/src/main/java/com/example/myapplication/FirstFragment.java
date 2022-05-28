@@ -14,12 +14,8 @@ import androidx.fragment.app.Fragment;
 import com.example.myapplication.databinding.FragmentFirstBinding;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class FirstFragment extends Fragment {
@@ -28,7 +24,7 @@ public class FirstFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
 
@@ -40,7 +36,8 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LinearLayout linear=(LinearLayout) getView().findViewById(R.id.history_button_layout);
+
+        LinearLayout linear = getView().findViewById(R.id.history_button_layout);
 
         File root = this.getActivity().getFilesDir();
         File[] files = root.listFiles();

@@ -194,11 +194,15 @@ public class TCPClient_Waiting extends AppCompatActivity {
             byte[] score_byte = new byte[4];
             System.arraycopy(data, 0, score_byte, 0,score_byte.length);
             data = cliparray(data, 4);
-            int score_int = ByteBuffer.wrap(score_byte).getInt();
-            score = score_int;
-            System.out.println("score = " + score_int);
+            score = ByteBuffer.wrap(score_byte).getInt();
+            System.out.println("origin score = " + score);
+            if(score > 1600)
+                score = (score - 1600);
+            else
+                score = 0;
+            System.out.println("after score = " + score);
             alldatalength_int -= 4;
-            String scoreStr = "_" + String.valueOf(score_int);
+            String scoreStr = "_" + String.valueOf(score);
             File scorefile = new File(folderName + "/book_information.txt");
             FileOutputStream outputStream;
             try {
@@ -265,8 +269,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
         System.out.println("age = " + age);
         double discount = 0; // 宣告折舊比例
         String t = "";
-        double item1 = (double)CTR / ((double)CTR + 50000.0);
-        double item2 = Math.pow(2.71, -Math.pow(score / 3500.0, 2.0));
+        double item1 = (double)CTR / ((double)CTR + 1000.0);
+        double item2 = Math.pow(2.71, -Math.pow(score / 150.0, 2.0));
         if(bookkind.equals("文學小說") || bookkind.equals("人文史地")){
             System.out.println("in 文史");
             double item3 = 30.0 / (Math.log(age + 1.0) + 30.0);
@@ -276,9 +280,8 @@ public class TCPClient_Waiting extends AppCompatActivity {
             double item3 = ((4.0 / 5.0) * (1.0 / (Math.pow(1.8, age - 8) + 1.0))) + (1.0 / 5.0 * 50.0 / (age + 50.0));
             discount = item1 * item2 * item3;
         }
-        System.out.println("1 discount = " + discount);
         discount = (float)Math.round(discount*100.0)/100.0;
-        System.out.println("2 discount = " + discount);
+        System.out.println("discount = " + discount);
         if(bookprize.equals("")){
             t = "_" + String.valueOf(0) + "_" + String.valueOf(discount);
         }
@@ -314,7 +317,6 @@ public class TCPClient_Waiting extends AppCompatActivity {
             try {
                 final Document docs = conn.get();
                 tmp = docs.select("div[id=result-stats]").text();
-                System.out.println("tmp = " + tmp);
             }catch (IOException e){
                 e.printStackTrace();
             }

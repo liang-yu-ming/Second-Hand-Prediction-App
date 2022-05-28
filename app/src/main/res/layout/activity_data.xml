@@ -6,30 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".Data">
 
-    <TextView
-        android:id="@+id/data_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
-        android:text="選擇書籍資料:"
-        android:textSize="@dimen/sp_18"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/dp_50"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/data_title">
+        app:layout_constraintTop_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <TextView
+            android:id="@+id/data_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_gravity="center"
+            android:text="選擇書籍資料:"
+            android:textSize="@dimen/sp_18" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_marginLeft="@dimen/dp_70"
+            android:layout_marginTop="@dimen/dp_20"
             android:orientation="horizontal">
 
             <TextView
@@ -54,15 +53,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:layout_marginTop="@dimen/dp_10"
             android:layout_marginLeft="@dimen/dp_70"
+            android:layout_marginTop="@dimen/dp_10"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/TextBookMonth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="書籍年齡:"
+                android:text="出版日期:"
                 android:textSize="@dimen/sp_15" />
 
             <EditText
@@ -79,8 +78,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:layout_marginTop="20dp"
             android:layout_marginLeft="@dimen/dp_70"
+            android:layout_marginTop="@dimen/dp_10"
             android:orientation="horizontal">
 
             <TextView
@@ -102,7 +101,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dp_40"
+            android:layout_marginTop="@dimen/dp_10"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/TextBookPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="書籍總頁數"
+                android:textSize="@dimen/sp_15" />
+
+            <EditText
+                android:id="@+id/EditTextBookPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:hint="e.g. 370"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="@dimen/sp_15" />
+
+            <Button
+                android:id="@+id/ButtonChoosePage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:text="指定內頁頁數"
+                android:textSize="@dimen/sp_12" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/TextPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp_15"
+            android:text="請輸入書籍頁數" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp_15"
             android:orientation="horizontal">
 
             <TextView
@@ -199,7 +240,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dp_40"
+            android:layout_marginTop="@dimen/dp_20"
             android:orientation="horizontal">
 
             <TextView
@@ -214,8 +255,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
-                android:ems="8"
-                android:inputType="textPersonName"
+                android:inputType="number"
+                android:maxLength="10"
                 android:hint="e.g.100"
                 android:textSize="@dimen/sp_15" />
         </LinearLayout>
@@ -225,10 +266,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dp_40"
+            android:layout_marginTop="@dimen/dp_20"
             android:text="send"
-            android:textSize="@dimen/sp_10"/>
+            android:textSize="@dimen/sp_10" />
 
     </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_20"
+        app:srcCompat="@drawable/camera"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

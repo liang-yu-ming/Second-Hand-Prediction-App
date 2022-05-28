@@ -12,10 +12,14 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.view.MotionEvent;
@@ -25,10 +29,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,20 +43,25 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class Data extends AppCompatActivity {
 
     public static final int READ_REQUEST_CODE = 1;
+    public static final int CAMERA_REQUEST_CODE = 2;
     private int buttonCalled = 0;
     private byte[] Sendmsg = new byte[0];
     private ByteArrayOutputStream Imagemsg = new ByteArrayOutputStream();
     public String current_folder_name = "";
     public int photocount = 0;
+    private String pageContent;
 
     Button ButtonPageClass1;
     Button ButtonPageClass2;
@@ -65,6 +77,8 @@ public class Data extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
+        Button ButtonChoosePage = (Button) findViewById(R.id.ButtonChoosePage);
+        ButtonPageClass1 = (Button) findViewById(R.id.ButtonPageClass1);
         ButtonPageClass2 = (Button) findViewById(R.id.ButtonPageClass2);
         ButtonPageClass3 = (Button) findViewById(R.id.ButtonPageClass3);
         ButtonPageClass1 = (Button) findViewById(R.id.ButtonPageClass1);
@@ -73,6 +87,11 @@ public class Data extends AppCompatActivity {
         ButtonPageClass6 = (Button) findViewById(R.id.ButtonPageClass6);
         ButtonPageClass7 = (Button) findViewById(R.id.ButtonPageClass7);
         to_tcpclientwaiting_page = (Button) findViewById(R.id.ButtonSend);
+        FloatingActionButton camera = (FloatingActionButton) findViewById(R.id.camera);
+        TextView TextPage = (TextView) findViewById(R.id.TextPage);
+        EditText EditTextBookPage = (EditText) findViewById(R.id.EditTextBookPage);
+        ButtonChoosePage.setEnabled(false);
+        ButtonPageClass1.setEnabled(false);
         ButtonPageClass2.setEnabled(false);
         ButtonPageClass3.setEnabled(false);
         ButtonPageClass4.setEnabled(false);
@@ -123,6 +142,72 @@ public class Data extends AppCompatActivity {
             }
         });
 
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg){
+                    ButtonChoosePage.setEnabled(true);
+            };
+        };
+
+        Runnable monitorEdittext = new Runnable(){
+            @Override
+            public void run(){
+                while (true) {
+                    if (!EditTextBookPage.getText().toString().equals("")){
+                        handler.sendEmptyMessage(0);
+                        break;
+                    }
+                    try {
+                        Thread.sleep(250);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        new Thread(monitorEdittext).start();
+
+        ButtonChoosePage.setOnClickListener(view -> {
+            int totalPage = Integer.valueOf(EditTextBookPage.getText().toString());
+            int[] page = new int[6];
+            boolean randomFlag = false;
+            if(totalPage >= 6){
+                if(randomFlag){
+                    for(int i = 0; i < 6; i++){
+                        page[i] = new Random().nextInt(totalPage) + 1;
+                        for (int j = 0; j < i; j++){
+                            if(page[i] == page[j]){
+                                page[i] = new Random().nextInt(totalPage) + 1;
+                                j = -1;
+                            }
+                        }
+                    }
+                }
+                else {
+                    page[0] = 1;
+                    page[1] = 2;
+                    page[2] = totalPage / 3;
+                    page[3] = totalPage / 2;
+                    page[4] = totalPage / 3 * 2;
+                    page[5] = totalPage;
+                }
+                Arrays.sort(page);
+                pageContent = Arrays.toString(page).replaceAll("\\[|\\]", "");
+                System.out.println(pageContent);
+                TextPage.setText("選擇以下 " + pageContent + " 內頁頁數");
+                ButtonPageClass1.setEnabled(true);
+                ButtonChoosePage.setEnabled(false);
+                pageContent = pageContent.replaceAll(" ", "");
+            }
+            else{
+                Toast.makeText(this, "請選擇 6 頁內頁以上的書籍!!", Toast.LENGTH_SHORT).show();
+                EditTextBookPage.setText("");
+                ButtonChoosePage.setEnabled(true);
+                new Thread(monitorEdittext).start();
+            }
+        });
+
         ButtonPageClass1.setOnClickListener(v -> { toMediaCabinet(1); });
         ButtonPageClass2.setOnClickListener(v -> { toMediaCabinet(2); });
         ButtonPageClass3.setOnClickListener(v -> { toMediaCabinet(3); });
@@ -131,7 +216,6 @@ public class Data extends AppCompatActivity {
         ButtonPageClass6.setOnClickListener(v -> { toMediaCabinet(6); });
         ButtonPageClass7.setOnClickListener(v -> { toMediaCabinet(7); });
 
-        EditText test = (EditText)findViewById(R.id.EditTextBookName);
         to_tcpclientwaiting_page.setOnClickListener(v -> {
             Intent intent = new Intent(Data.this, TCPClient_Waiting.class);
 
@@ -153,12 +237,10 @@ public class Data extends AppCompatActivity {
             File folder_tmp = new File(folder_tmp_name);
             File[] photo_files = folder_tmp.listFiles();
             for(File file : photo_files){
-                System.out.println("old : " + file.getPath());
                 String oldPath = file.getPath();
                 String[] oldPathCount = oldPath.split("/");
                 oldPathCount[oldPathCount.length - 1] = oldPathCount[oldPathCount.length - 1].substring(5, oldPathCount[oldPathCount.length - 1].indexOf("."));
                 String new_path = folder_name + "/photo" + oldPathCount[oldPathCount.length - 1] + ".png";
-                System.out.println("new : " + new_path);
                 try {
                     fileCopy(oldPath, new_path);
                 }catch (IOException e){
@@ -178,6 +260,10 @@ public class Data extends AppCompatActivity {
             startActivity(intent);
         });
 
+        camera.setOnClickListener(view -> {
+            Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        });
     }
 
     @Override
@@ -194,7 +280,7 @@ public class Data extends AppCompatActivity {
                 if (permissions[0].equals(Manifest.permission.CAMERA)) word.append("儲存權限");
                 else word.append("相機權限");
                 word.append("已取得");
-
+                System.out.println(word);
                 break;
             case 2:
                 for (int i = 0; i < permissions.length; i++) {
@@ -288,9 +374,7 @@ public class Data extends AppCompatActivity {
                 try{
                     FileInputStream input = new FileInputStream(file.getAbsolutePath());
                     byte[] oneimagedata = new byte[(int)file.length()];//宣告imagedata來存放圖片的內容
-                    System.out.println("oneimagedata = " + file.length());
                     byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
-                    System.out.println("oneImageLength size = " + oneImageLength.length);
                     input.read(oneimagedata);//將圖片內容放進oneimagedata
                     Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
                     Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
@@ -310,9 +394,7 @@ public class Data extends AppCompatActivity {
                         try {
                             FileInputStream input = new FileInputStream(file.getAbsolutePath());//取得圖片流
                             byte[] oneimagedata = new byte[(int)file.length()];//宣告一個byte array用來存放一張圖片
-                            System.out.println("oneimagedata = " + file.length());
                             byte[] oneImageLength = ByteBuffer.allocate(4).putInt((int)file.length()).array();//宣告長度為4的byte array紀錄一張圖片的長度
-                            System.out.println("oneImageLength size = " + oneImageLength.length);
                             input.read(oneimagedata);//將圖片內容放進oneimagedata
                             Imagemsg.write(oneImageLength);//將一張圖片的長度放進Imagemsg
                             Imagemsg.write(oneimagedata);//將圖片內容放進Imagemsg
@@ -455,25 +537,9 @@ public class Data extends AppCompatActivity {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-        int width = options.outWidth, height = options.outHeight;
-
-        // 將圖檔等比例縮小至寬度為512
-        final int MAX_SIZE = 512;
-        float resize_width = 1, resize_heigth = 1; // 縮小值 resize 可為任意小數
-        if(width>MAX_SIZE){
-            resize_width = ((float) MAX_SIZE) / width;
-        }
-        if(height>MAX_SIZE){
-            resize_heigth = ((float) MAX_SIZE) / height;
-        }
-
-        // 產生縮圖需要的參數 matrix
-        Matrix matrix = new Matrix();
-        matrix.postScale(resize_width, resize_heigth); // 設定寬高的縮放比例
-
-        // 產生縮小後的圖
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-        return resizedBitmap;
+        int rotated = getOrientation(imagePath);
+        bitmap = rotateImage(bitmap, rotated);
+        return Bitmap.createScaledBitmap(bitmap, 512, 512, true);
     }
 
     public String saveBitmap(Bitmap bitmap, int count) {
@@ -560,6 +626,7 @@ public class Data extends AppCompatActivity {
 
     public void write_string(File file, String name, String input){
         File outFile = new File(file, name);
+        System.out.println(input);
         FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(outFile, true);
@@ -574,10 +641,15 @@ public class Data extends AppCompatActivity {
     public void write_book_information(Book book){
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
         String t = format.format(new Date());
+        System.out.println("currrnt date write in txt = " + t);
         t += "_" + book.getBookname();
-        t += "_" + book.getBookmonth();
+        String tmp = book.getBookmonth();
+        String[] tmpSplit = tmp.split("-");
+        t += "_" + tmpSplit[0] + "-" + String.valueOf(Integer.valueOf(tmpSplit[1]) + 1) + "-" +  tmpSplit[2];
+        System.out.println("book date write in txt = " + book.getBookmonth());
         t += "_" + book.getBookprize();
         t += "_" + book.getBookkind();
+        t += "_" + pageContent;
 
         File dir = new File(current_folder_name);
         String index = "book_information.txt";
@@ -619,6 +691,7 @@ public class Data extends AppCompatActivity {
         String name = "\"" + BookName.getText().toString() + "\"";
 
         String month = mEditText.getText().toString(); //取得BookMonth的參考
+        System.out.println("month = " + month);
 
         EditText BookPrize = (EditText) findViewById(R.id.EditTextBookPrize); //取得BookPrize的參考
         String prize = BookPrize.getText().toString(); //取得原始價格(string)
@@ -639,5 +712,37 @@ public class Data extends AppCompatActivity {
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
+    }
+
+    private int getOrientation(String imageSrc){
+        int rotated = 0;
+        try {
+            ExifInterface ei = new ExifInterface(imageSrc);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotated = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotated = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotated = 270;
+                    break;
+                case ExifInterface.ORIENTATION_NORMAL:
+                default:
+                    rotated = 0;
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return rotated;
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 }
